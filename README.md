@@ -3,7 +3,7 @@ rtorrent-feeder
 
 Automatically downloads magnets from EZRSS and The Pirate Bay
 
-**This script is intended to work with rtorrent:[http://libtorrent.rakshasa.no/]**
+**This script is intended to work with [rtorrent](http://libtorrent.rakshasa.no/)**
 
 The following functionality is provided:
  * Downloads TV show magnets using EZRSS as primary source and TPB as failback
@@ -16,8 +16,7 @@ Installation
 ------------
  - Drop the script on your system
  - Configure it
- - Create a similar crontab entry for periodic execution:
-    */5 * * * * python /home/rt/rtorrent-feeder.py
+ - Create a similar crontab entry for periodic execution: <pre><code>*/5 * * * * python /home/rt/rtorrent-feeder.py</code></pre>
 
 
 Configuration Example
