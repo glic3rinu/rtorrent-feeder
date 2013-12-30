@@ -7,13 +7,14 @@ Automatically downloads magnets from EZRSS and The Pirate Bay
 
 The following functionality is provided:
  * Downloads TV show magnets using [EZRSS](http://ezrss.it/) as primary source and [TPB](http://thepiratebay.se) as failback
- * Downloads subtitles from [Addic7ed](http://www.addic7ed.com/)
- * Sends email alerts
+ * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
+ * Optional email alerts of new downloads
  * Allows quality to be specified (720p or low)
 
 
 Installation
 ------------
+0. Make sure you have Python >= 2.6
 1. Drop the script on your system
 2. Configure it
 3. Create a similar crontab entry for periodic execution: <pre><code>*/5 * * * * python /home/rt/rtorrent-feeder.py</code></pre>
