@@ -14,9 +14,9 @@ The following functionality is provided:
 
 Installation
 ------------
- - Drop the script on your system
- - Configure it
- - Create a similar crontab entry for periodic execution: <pre><code>*/5 * * * * python /home/rt/rtorrent-feeder.py</code></pre>
+1. Drop the script on your system
+2. Configure it
+3. Create a similar crontab entry for periodic execution: <pre><code>*/5 * * * * python /home/rt/rtorrent-feeder.py</code></pre>
 
 
 Configuration Example
