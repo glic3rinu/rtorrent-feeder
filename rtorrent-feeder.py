@@ -112,10 +112,12 @@ for serie in SERIES:
     if serie.get('hd', 0):
         feed = feeds.get('hd',
             ET.parse(urllib.urlopen('http://rss.thepiratebay.se/208')))
+        feeds['hd'] = feed
         regex += '720p '
     else:
         feed = feeds.get('lo',
             ET.parse(urllib.urlopen('http://rss.thepiratebay.se/205')))
+        feeds['lo'] = feed
     regex += '(?:HDTV|WEBRip) x264-\w+ \[(?:eztv|PublicHD)\]$'
     regex = regex.replace(' ', '.')
     # Search for new episodes to download
