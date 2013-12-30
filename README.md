@@ -1,9 +1,7 @@
 rtorrent-feeder
 ===============
 
-Automatically downloads magnets from EZRSS and The Pirate Bay
-
-**This script is intended to work with [rtorrent](http://libtorrent.rakshasa.no/)**
+Automatically downloads magnets from EZRSS and The Pirate Bay for [rtorrent](http://libtorrent.rakshasa.no/)
 
 The following functionality is provided:
  * Downloads TV show magnets using [EZRSS](http://ezrss.it/) as primary source and [TPB](http://thepiratebay.se) as failback
