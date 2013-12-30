@@ -4,7 +4,7 @@ rtorrent-feeder
 Automatically downloads magnets from EZRSS and The Pirate Bay for [rtorrent](http://libtorrent.rakshasa.no/)
 
 The following functionality is provided:
- * Downloads TV show magnets using [EZRSS](http://ezrss.it/) as primary source and [TPB](http://thepiratebay.se) as failback
+ * Downloads TV show magnets from [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via rss
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
  * Allows quality to be specified (720p or low)

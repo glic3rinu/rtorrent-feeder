@@ -75,7 +75,6 @@ def download_magnet(item, match, season, episode, serie):
 
 
 downloads = []
-processed = []
 
 
 # Download magnets from EZRSS
@@ -102,14 +101,11 @@ for serie in SERIES:
         description = item.find('description').text
         match = re.match(regex, description)
         download_magnet(item, match, season, episode, serie)
-        if serie not in processed:
-            processed.append(serie)
 
 
-# Failback: Download magnets from The Pirate Bay (eztv and PublicHD)
-remaining = [serie for serie in SERIES if serie not in processed]
+# Download magnets from The Pirate Bay (eztv and PublicHD)
 feeds = {}
-for serie in remaining:
+for serie in SERIES:
     # Construct regular expression and select quality feed
     # TODO 'trust mechanism' based on user rather than perfect title matching ?
     regex = '^%s S(\d+)E(\d+) ' % serie['name']
