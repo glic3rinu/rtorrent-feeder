@@ -44,7 +44,6 @@ Configuration Example
     ]
     # </CONFIG>
     
-    
     SUBTITLES_PATH = '/media/data/subtitles/'
     TORRENT_WATCH_PATH = '~/TorrentsToWatch/'
     

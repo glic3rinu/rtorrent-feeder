@@ -132,22 +132,23 @@ for serie in remaining:
 
 
 # Download subtitles from addic7ed.com
-addic7ed = urllib.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
-addic7ed = ET.parse(addic7ed)
-for item in addic7ed.getroot()[0].findall('item'):
-    language = item.find('description').text.split(', ')[1]
-    if language == 'English':
-        title = item.find('title').text
-        for serie in SERIES:
-            regex = r"^%s - " % serie['name']
-            if re.match(regex, title):
-                link = item.find('link').text
-                filename = os.path.join(SUBTITLES_PATH, title+'.srt')
-                urllib.urlretrieve(link, filename)
-                break
+if SUBTITLES_PATH:
+    addic7ed = urllib.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
+    addic7ed = ET.parse(addic7ed)
+    for item in addic7ed.getroot()[0].findall('item'):
+        language = item.find('description').text.split(', ')[1]
+        if language == 'English':
+            title = item.find('title').text
+            for serie in SERIES:
+                regex = r"^%s - " % serie['name']
+                if re.match(regex, title):
+                    link = item.find('link').text
+                    filename = os.path.join(SUBTITLES_PATH, title+'.srt')
+                    urllib.urlretrieve(link, filename)
+                    break
 
 
-if downloads:
+if downloads and EMAIL_USER:
     # Save new state
     config = 'SERIES = ' + json.dumps(SERIES, indent=4)
     context = {
