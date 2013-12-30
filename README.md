@@ -6,10 +6,10 @@ Automatically downloads magnets from EZRSS and The Pirate Bay
 **This script is intended to work with [rtorrent](http://libtorrent.rakshasa.no/)**
 
 The following functionality is provided:
- * Downloads TV show magnets using EZRSS as primary source and TPB as failback
- * Downloads subtitles from Addic7ed
+ * Downloads TV show magnets using [EZRSS](http://ezrss.it/) as primary source and [TPB](http://thepiratebay.se) as failback
+ * Downloads subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Sends email alerts
- * Allows to specify quality (720p or low)
+ * Allows quality to be specified (720p or low)
 
 
 Installation
