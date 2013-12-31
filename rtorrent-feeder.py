@@ -10,12 +10,7 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
 
-# The following CONFIG block will be used as JSON-based persistent storage
-#   'name' should be the exact, case-sensitive, tv show title
-#   If 'hd' is set to 0, or not set, only low quality will be downloaded
-#   If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
-#
-# Example:
+# Example with one serie:
 # SERIES = [
 #    {
 #        "season": 1, 
@@ -25,7 +20,12 @@ from email.MIMEText import MIMEText
 #    }, 
 # ]
 #
+# 'name' should be the exact, case-sensitive, tv show title
+# If 'hd' is set to 0, or not set, only low quality will be downloaded
+# If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
+#
 # ** DON'T REMOVE <CONFIG> </CONFIG> LABELS **
+# because this block is re-used as JSON-based persistent storage :)
 #
 # <CONFIG>
 SERIES = []
