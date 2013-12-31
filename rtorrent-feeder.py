@@ -93,7 +93,7 @@ for serie in SERIES:
     try:
         ezrss = urllib.urlopen(url)
     except IOError:
-        logging.error('Querying %s' % url)
+        logging.error('Querying %s ABORTING' % url)
         break
     if ezrss.getcode() != 200:
         logging.error('Querying %s' % url)
