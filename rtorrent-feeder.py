@@ -68,7 +68,7 @@ def download_magnet(item, match, season, episode, serie):
             'cd %(torrent_watch_path)s; \n'
             '[[ "$MAGNET" =~ xt=urn:btih:([^&/]+) ]] || exit; \n'
             'echo "d10:magnet-uri${#MAGNET}:${MAGNET}e"'
-            ' > "meta-${BASH_REMATCH[1]}.torrent"; \n'
+            '   > "meta-${BASH_REMATCH[1]}.torrent"; \n'
             % context, shell=True, executable='/bin/bash')
         title = item.find('title').text
         downloads.append((title, serie))
@@ -167,7 +167,7 @@ if downloads:
         "   '/^# <CONFIG>/{p=1; print; print config;}/# <\/CONFIG>$/{p=0}!p'"
         "   %(script)s > %(script)s.tmp;"
         "mv %(script)s.tmp %(script)s;"
-            % context, shell=True)
+        % context, shell=True)
     
     if EMAIL_USER:
         # Send email
