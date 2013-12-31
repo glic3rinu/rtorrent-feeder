@@ -11,10 +11,23 @@ from email.MIMEText import MIMEText
 
 
 # The following CONFIG block will be used as JSON-based persistent storage
-# ** DON'T REMOVE <CONFIG> </CONFIG> LABELS **
+#   'name' should be the exact, case-sensitive, tv show title
+#   If 'hd' is set to 0, or not set, only low quality will be downloaded
+#   If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
 #
-# 'name' should be the exact tv show title, and is case-sensitive
-# If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
+# Example:
+# # <CONFIG>
+# SERIES = [
+#    {
+#        "season": 1, 
+#        "episode": 10, 
+#        "name": "Breaking Bad", 
+#        "hd": 1
+#    }, 
+# ]
+# # </CONFIG>
+#
+# ** DON'T REMOVE <CONFIG> </CONFIG> LABELS **
 #
 # <CONFIG>
 SERIES = []
@@ -25,7 +38,7 @@ SUBTITLES_PATH = ''
 SUBTITLES_LANGUAGE = 'English'
 TORRENT_WATCH_PATH = ''
 TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
-LOG_LEVEL = ''
+LOG_LEVEL = logging.ERROR
 
 EMAIL_USER = ''
 EMAIL_PASSWORD = ''
