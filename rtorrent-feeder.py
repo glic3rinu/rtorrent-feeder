@@ -1,10 +1,11 @@
-import os
-import re
 import json
+import logging
+import os
+import smtplib
+import re
 import subprocess
 import urllib
 import xml.etree.ElementTree as ET
-import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
@@ -16,36 +17,24 @@ from email.MIMEText import MIMEText
 # If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
 #
 # <CONFIG>
-SERIES = [
-    {
-        "season": 1, 
-        "episode": 10, 
-        "name": "The Blacklist", 
-    }, 
-    {
-        "season": 1, 
-        "episode": 13, 
-        "name": "House of Cards", 
-        "hd": 1
-    }, 
-    {
-        "season": 3, 
-        "episode": 11, 
-        "name": "Person of Interest", 
-        "hd": 1
-    }
-]
+SERIES = []
 # </CONFIG>
 
 
-SUBTITLES_PATH = '/media/data/subtitles/'
-TORRENT_WATCH_PATH = '~/TorrentsToWatch/'
+SUBTITLES_PATH = ''
+SUBTITLES_LANGUAGE = 'English'
+TORRENT_WATCH_PATH = ''
+TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
+LOG_LEVEL = ''
 
-EMAIL_USER = 'youremail@example.com'
-EMAIL_PASSWORD = 'randompassword'
-EMAIL_RECIPIENTS = ['listofpeople@to-notify.com']
-EMAIL_SMTP_HOST = 'smtp.your-host.com'
+EMAIL_USER = ''
+EMAIL_PASSWORD = ''
+EMAIL_RECIPIENTS = []
+EMAIL_SMTP_HOST = ''
 EMAIL_SMTP_PORT = 25
+
+
+logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 
 
 def download_magnet(item, match, season, episode, serie):
@@ -57,6 +46,7 @@ def download_magnet(item, match, season, episode, serie):
         torrent = '{http://xmlns.ezrss.it/0.1/}torrent'
         magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
         magnet = item.find(torrent).find(magnetURI).text
+        logging.info('Downloading %s' % magnet)
         context = {
             'magnet': magnet,
             'torrent_watch_path': TORRENT_WATCH_PATH
@@ -78,7 +68,7 @@ downloads = []
 
 
 # Download magnets from EZRSS
-url = 'http://ezrss.it/search/index.php'
+base_url = 'http://ezrss.it/search/index.php'
 for serie in SERIES:
     # Construct URL query
     name = serie['name'].replace(' ', '+')
@@ -87,12 +77,16 @@ for serie in SERIES:
     else:
         quality = 'quality=HDTV&quality_exact=true'
     query = 'show_name=%s&show_name_exact=true&%s&mode=rss' % (name, quality)
+    url = base_url + '?' + query
     try:
-        ezrss = urllib.urlopen(url + '?' + query)
+        ezrss = urllib.urlopen(url)
     except IOError:
+        logging.error('Querying %s' % url)
         break
     if ezrss.getcode() != 200:
+        logging.error('Querying %s' % url)
         continue
+    logging.info('Querying %s' % url)
     # Search for new episodes to download
     ezrss = ET.parse(ezrss)
     regex = '.* Season: (\d+); Episode: (\d+)$'
@@ -104,29 +98,31 @@ for serie in SERIES:
 
 
 # Download magnets from The Pirate Bay (eztv and PublicHD)
-feeds = {}
-for serie in SERIES:
-    # Construct regular expression and select quality feed
-    # TODO 'trust mechanism' based on user rather than perfect title matching ?
-    regex = '^%s S(\d+)E(\d+) ' % serie['name']
-    if serie.get('hd', 0):
-        feed = feeds.get('hd',
-            ET.parse(urllib.urlopen('http://rss.thepiratebay.se/208')))
-        feeds['hd'] = feed
-        regex += '720p '
-    else:
-        feed = feeds.get('lo',
-            ET.parse(urllib.urlopen('http://rss.thepiratebay.se/205')))
-        feeds['lo'] = feed
-    regex += '(?:HDTV|WEBRip) x264-\w+ \[(?:eztv|PublicHD)\]$'
-    regex = regex.replace(' ', '.')
-    # Search for new episodes to download
-    for item in feed.getroot()[0].findall('item'):
-        title = item.find('title').text
-        match = re.match(regex, title, re.IGNORECASE)
-        if match:
-            season, episode = serie['season'], serie['episode']
-            download_magnet(item, match, season, episode, serie)
+try:
+    feeds = {
+        'hd': ET.parse(urllib.urlopen('http://rss.thepiratebay.se/208')),
+        'lo': ET.parse(urllib.urlopen('http://rss.thepiratebay.se/205'))
+    }
+except IOError, ET.ParseError:
+    logging.error('TPB seems down')
+else:
+    for serie in SERIES:
+        # Construct regular expression and select quality feed
+        regex = '^%s S(\d+)E(\d+).+' % serie['name']
+        feed = feeds['lo']
+        if serie.get('hd', 0):
+            feed = feeds['hd']
+            regex += '720p '
+        regex = regex.replace(' ', '.')
+        logging.info('TPB regex: %s' % regex)
+        # Search for new episodes to download
+        for item in feed.getroot()[0].findall('item'):
+            title = item.find('title').text
+            match = re.match(regex, title, re.IGNORECASE)
+            creator = '{http://purl.org/dc/elements/1.1/}creator'
+            if match and item.find(creator).text in TPB_TRUSTED_USERS:
+                season, episode = serie['season'], serie['episode']
+                download_magnet(item, match, season, episode, serie)
 
 
 # Download subtitles from addic7ed.com
@@ -135,7 +131,7 @@ if SUBTITLES_PATH:
     addic7ed = ET.parse(addic7ed)
     for item in addic7ed.getroot()[0].findall('item'):
         language = item.find('description').text.split(', ')[1]
-        if language == 'English':
+        if language == SUBTITLES_LANGUAGE:
             title = item.find('title').text
             for serie in SERIES:
                 regex = r"^%s - " % serie['name']
@@ -156,7 +152,7 @@ if downloads:
     subprocess.call(
         "CONFIG='%(config)s';"
         "awk -v config=\"$CONFIG\""
-        "   '/^# <CONFIG>/{p=1;print;print config;}/# <\/CONFIG>$/{p=0}!p'"
+        "   '/^# <CONFIG>/{p=1; print; print config;}/# <\/CONFIG>$/{p=0}!p'"
         "   %(script)s > %(script)s.tmp;"
         "mv %(script)s.tmp %(script)s;"
             % context, shell=True)
@@ -168,6 +164,7 @@ if downloads:
         msg['To'] = ', '.join(EMAIL_RECIPIENTS)
         msg['Subject'] = "%d New Downloads Available" % len(downloads)
         msg.attach(MIMEText('\n'.join([d[0] for d in downloads])))
+        logging.info('Sending email to %s' % msg['To'])
         server = smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT)
         server.ehlo()
         server.starttls()
@@ -175,5 +172,3 @@ if downloads:
         server.login(EMAIL_USER, EMAIL_PASSWORD)
         server.sendmail(EMAIL_USER, EMAIL_RECIPIENTS, msg.as_string())
         server.close()
-    
-    print downloads

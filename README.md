@@ -44,10 +44,13 @@ Configuration Example
     # </CONFIG>
     
     SUBTITLES_PATH = '/media/data/subtitles/'
+    SUBTITLES_LANGUAGE = 'English'
     TORRENT_WATCH_PATH = '~/TorrentsToWatch/'
+    TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
+    LOG_LEVEL = logging.INFO
     
-    EMAIL_USER = 'youremail@example.com'
+    EMAIL_USER = 'randomaddress@gmail.com'
     EMAIL_PASSWORD = 'randompassword'
-    EMAIL_RECIPIENTS = ['listofpeople@to-notify.com']
-    EMAIL_SMTP_SERVER = 'smtp.your-host.com'
-    EMAIL_SMTP_PORT = 25
+    EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
+    EMAIL_SMTP_SERVER = 'smtp.gmail.com'
+    EMAIL_SMTP_PORT = 587
