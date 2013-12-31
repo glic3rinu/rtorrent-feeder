@@ -15,7 +15,6 @@ from email.MIMEText import MIMEText
 #   If 'hd' is set to 0, or not set, only low quality will be downloaded
 #   If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
 #
-# Example:
 # # <CONFIG>
 # SERIES = [
 #    {
