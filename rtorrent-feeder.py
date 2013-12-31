@@ -146,7 +146,7 @@ if SUBTITLES_PATH:
                     break
 
 
-if downloads and EMAIL_USER:
+if downloads:
     # Save new state
     config = 'SERIES = ' + json.dumps(SERIES, indent=4)
     context = {
@@ -161,19 +161,19 @@ if downloads and EMAIL_USER:
         "mv %(script)s.tmp %(script)s;"
             % context, shell=True)
     
-    # Send email
-    msg = MIMEMultipart()
-    msg['From'] = EMAIL_USER
-    msg['To'] = ', '.join(EMAIL_RECIPIENTS)
-    msg['Subject'] = "%d New Downloads Available" % len(downloads)
-    msg.attach(MIMEText('\n'.join([d[0] for d in downloads])))
-    server = smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT)
-    server.ehlo()
-    server.starttls()
-    server.ehlo()
-    server.login(EMAIL_USER, EMAIL_PASSWORD)
-    server.sendmail(EMAIL_USER, EMAIL_RECIPIENTS, msg.as_string())
-    server.close()
-
+    if EMAIL_USER:
+        # Send email
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_USER
+        msg['To'] = ', '.join(EMAIL_RECIPIENTS)
+        msg['Subject'] = "%d New Downloads Available" % len(downloads)
+        msg.attach(MIMEText('\n'.join([d[0] for d in downloads])))
+        server = smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
+        server.sendmail(EMAIL_USER, EMAIL_RECIPIENTS, msg.as_string())
+        server.close()
+    
     print downloads
-
