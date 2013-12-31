@@ -11,7 +11,7 @@ from email.MIMEText import MIMEText
 
 
 # The following CONFIG block will be used as JSON-based persistent storage
-# ** DON'T REMOVE THE LABELS <CONFIG> </CONFIG> **
+# ** DON'T REMOVE <CONFIG> </CONFIG> LABELS **
 #
 # 'name' should be the exact tv show title, and is case-sensitive
 # If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
