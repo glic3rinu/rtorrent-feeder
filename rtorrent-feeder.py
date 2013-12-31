@@ -64,11 +64,11 @@ def download_magnet(item, match, season, episode, serie):
             'torrent_watch_path': TORRENT_WATCH_PATH
         }
         subprocess.call(
-            'MAGNET="%(magnet)s"; \n'
-            'cd %(torrent_watch_path)s; \n'
-            '[[ "$MAGNET" =~ xt=urn:btih:([^&/]+) ]] || exit; \n'
+            'MAGNET="%(magnet)s";'
+            'cd %(torrent_watch_path)s;'
+            '[[ "$MAGNET" =~ xt=urn:btih:([^&/]+) ]] || exit;'
             'echo "d10:magnet-uri${#MAGNET}:${MAGNET}e"'
-            '   > "meta-${BASH_REMATCH[1]}.torrent"; \n'
+            '   > "meta-${BASH_REMATCH[1]}.torrent";'
             % context, shell=True, executable='/bin/bash')
         title = item.find('title').text
         downloads.append((title, serie))
