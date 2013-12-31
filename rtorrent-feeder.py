@@ -48,6 +48,8 @@ EMAIL_SMTP_PORT = 25
 
 logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 
+downloads = []
+
 
 def download_magnet(item, match, season, episode, serie):
     """ Downloads item's magnet if match is a new episode """
@@ -71,12 +73,9 @@ def download_magnet(item, match, season, episode, serie):
             '   > "meta-${BASH_REMATCH[1]}.torrent";'
             % context, shell=True, executable='/bin/bash')
         title = item.find('title').text
-        downloads.append((title, serie))
+        downloads.append(title)
         serie['season'] = max(serie['season'], s)
         serie['episode'] = max(serie['episode'], e)
-
-
-downloads = []
 
 
 # Download magnets from EZRSS
@@ -175,7 +174,7 @@ if downloads:
         msg['From'] = EMAIL_USER
         msg['To'] = ', '.join(EMAIL_RECIPIENTS)
         msg['Subject'] = "%d New Downloads Available" % len(downloads)
-        msg.attach(MIMEText('\n'.join([d[0] for d in downloads])))
+        msg.attach(MIMEText('\n'.join(downloads)))
         logging.info('Sending email to %s' % msg['To'])
         server = smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT)
         server.ehlo()
