@@ -31,7 +31,6 @@ from email.MIMEText import MIMEText
 SERIES = []
 # </CONFIG>
 
-
 SUBTITLES_PATH = ''
 SUBTITLES_LANGUAGE = 'English'
 TORRENT_WATCH_PATH = ''
