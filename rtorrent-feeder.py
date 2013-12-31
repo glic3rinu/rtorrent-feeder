@@ -97,7 +97,7 @@ for serie in SERIES:
         download_magnet(item, match, season, episode, serie)
 
 
-# Download magnets from The Pirate Bay (eztv and PublicHD)
+# Download magnets from The Pirate Bay, only from TPB_TRUSTED_USERS
 try:
     feeds = {
         'hd': ET.parse(urllib.urlopen('http://rss.thepiratebay.se/208')),
