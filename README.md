@@ -1,7 +1,7 @@
 rtorrent-feeder
 ===============
 
-Automatically downloads magnets from EZRSS and The Pirate Bay. Designed for [rtorrent](http://libtorrent.rakshasa.no/), but works with any torrent client able to watch on a directory for new torrents.
+Automatically downloads magnets from EZRSS and The Pirate Bay. Designed for [rtorrent](http://libtorrent.rakshasa.no/), but works with any other client able to watch on a directory for new torrents.
  * Download TV show magnets from [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via rss
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
