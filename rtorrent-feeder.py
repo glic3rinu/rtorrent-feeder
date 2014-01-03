@@ -130,7 +130,8 @@ else:
             title = item.find('title').text
             match = re.match(regex, title, re.IGNORECASE)
             creator = '{http://purl.org/dc/elements/1.1/}creator'
-            if match and item.find(creator).text in TPB_TRUSTED_USERS:
+            creator = item.find(creator).text
+            if match and (not TPB_TRUSTED_USERS or creator in TPB_TRUSTED_USERS):
                 s, e = [ int(e) for e in match.groups() ]
                 if s > season or (s == season and e > episode):
                     download_magnet(item)
