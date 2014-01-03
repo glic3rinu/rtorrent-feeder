@@ -49,31 +49,25 @@ logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 downloads = []
 
 
-def download_magnet(item, match, season, episode, serie):
-    """ Downloads item's magnet if match is a new episode """
-    s, e = [ int(e) for e in match.groups() ]
-    if s > 19: # Workaround to some wrongly labeled episodes
-        return
-    if s > season or (s == season and e > episode):
-        torrent = '{http://xmlns.ezrss.it/0.1/}torrent'
-        magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
-        magnet = item.find(torrent).find(magnetURI).text
-        logging.info('Downloading %s' % magnet)
-        context = {
-            'magnet': magnet,
-            'torrent_watch_path': TORRENT_WATCH_PATH
-        }
-        subprocess.call(
-            'MAGNET="%(magnet)s";'
-            'cd %(torrent_watch_path)s;'
-            '[[ "$MAGNET" =~ xt=urn:btih:([^&/]+) ]] || exit;'
-            'echo "d10:magnet-uri${#MAGNET}:${MAGNET}e"'
-            '   > "meta-${BASH_REMATCH[1]}.torrent";'
-            % context, shell=True, executable='/bin/bash')
-        title = item.find('title').text
-        downloads.append(title)
-        serie['season'] = max(serie['season'], s)
-        serie['episode'] = max(serie['episode'], e)
+def download_magnet(item):
+    """ Downloads item's magnet """
+    torrent = '{http://xmlns.ezrss.it/0.1/}torrent'
+    magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
+    magnet = item.find(torrent).find(magnetURI).text
+    logging.info('Downloading %s' % magnet)
+    context = {
+        'magnet': magnet,
+        'torrent_watch_path': TORRENT_WATCH_PATH
+    }
+    subprocess.call(
+        'MAGNET="%(magnet)s";'
+        'cd %(torrent_watch_path)s;'
+        '[[ "$MAGNET" =~ xt=urn:btih:([^&/]+) ]] || exit;'
+        'echo "d10:magnet-uri${#MAGNET}:${MAGNET}e"'
+        '   > "meta-${BASH_REMATCH[1]}.torrent";'
+        % context, shell=True, executable='/bin/bash')
+    title = item.find('title').text
+    downloads.append(title)
 
 
 # Download magnets from EZRSS
@@ -103,7 +97,13 @@ for serie in SERIES:
     for item in ezrss.getroot()[0].findall('item'):
         description = item.find('description').text
         match = re.match(regex, description)
-        download_magnet(item, match, season, episode, serie)
+        s, e = [ int(e) for e in match.groups() ]
+        if s > 19: # Workaround to some wrongly labeled episodes
+            continue
+        if s > season or (s == season and e > episode):
+            download_magnet(item)
+            serie['season'] = max(serie['season'], s)
+            serie['episode'] = max(serie['episode'], e)
 
 
 # Download magnets from The Pirate Bay, only from TPB_TRUSTED_USERS
@@ -125,13 +125,17 @@ else:
         regex = regex.replace(' ', '.')
         logging.info('TPB regex: %s' % regex)
         # Search for new episodes to download
+        season, episode = serie['season'], serie['episode']
         for item in feed.getroot()[0].findall('item'):
             title = item.find('title').text
             match = re.match(regex, title, re.IGNORECASE)
             creator = '{http://purl.org/dc/elements/1.1/}creator'
             if match and item.find(creator).text in TPB_TRUSTED_USERS:
-                season, episode = serie['season'], serie['episode']
-                download_magnet(item, match, season, episode, serie)
+                s, e = [ int(e) for e in match.groups() ]
+                if s > season or (s == season and e > episode):
+                    download_magnet(item)
+                    serie['season'] = max(serie['season'], s)
+                    serie['episode'] = max(serie['episode'], e)
 
 
 # Download subtitles from addic7ed.com
