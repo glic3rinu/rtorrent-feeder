@@ -144,13 +144,16 @@ if SUBTITLES_PATH:
     addic7ed = urllib.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
     addic7ed = ET.parse(addic7ed)
     for item in addic7ed.getroot()[0].findall('item'):
-        language = item.find('description').text.split(', ')[1]
+        language = item.find('description').text.split(', ')[-1]
         if language == SUBTITLES_LANGUAGE:
             title = item.find('title').text
             for serie in SERIES:
                 regex = r"^%s - " % serie['name']
-                if re.match(regex, title):
+                if re.match(regex, title, re.IGNORECASE):
                     link = item.find('link').text
+                    html = '\n'.join(urllib.urlopen(link).readlines())
+                    path = re.findall('(/original/\d+/0)', html)[0]
+                    link = 'http://www.addic7ed.com' + path
                     filename = os.path.join(SUBTITLES_PATH, title+'.srt')
                     urllib.urlretrieve(link, filename)
                     break
