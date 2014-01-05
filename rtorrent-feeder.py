@@ -4,7 +4,7 @@ import os
 import smtplib
 import re
 import subprocess
-import urllib
+import urllib2
 import xml.etree.ElementTree as ET
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
@@ -82,7 +82,7 @@ for serie in SERIES:
     query = 'show_name=%s&show_name_exact=true&%s&mode=rss' % (name, quality)
     url = base_url + '?' + query
     try:
-        ezrss = urllib.urlopen(url)
+        ezrss = urllib2.urlopen(url)
     except IOError:
         logging.error('Querying %s ABORTING' % url)
         break
@@ -109,8 +109,8 @@ for serie in SERIES:
 # Download magnets from The Pirate Bay, only from TPB_TRUSTED_USERS
 try:
     feeds = {
-        'hd': ET.parse(urllib.urlopen('http://rss.thepiratebay.se/208')),
-        'lo': ET.parse(urllib.urlopen('http://rss.thepiratebay.se/205'))
+        'hd': ET.parse(urllib2.urlopen('http://rss.thepiratebay.se/208')),
+        'lo': ET.parse(urllib2.urlopen('http://rss.thepiratebay.se/205'))
     }
 except IOError, ET.ParseError:
     logging.error('TPB seems down')
@@ -141,7 +141,7 @@ else:
 
 # Download subtitles from addic7ed.com
 if SUBTITLES_PATH:
-    addic7ed = urllib.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
+    addic7ed = urllib2.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
     addic7ed = ET.parse(addic7ed)
     for item in addic7ed.getroot()[0].findall('item'):
         language = item.find('description').text.split(', ')[-1]
@@ -151,11 +151,16 @@ if SUBTITLES_PATH:
                 regex = r"^%s - " % serie['name']
                 if re.match(regex, title, re.IGNORECASE):
                     link = item.find('link').text
-                    html = '\n'.join(urllib.urlopen(link).readlines())
+                    html = '\n'.join(urllib2.urlopen(link).readlines())
                     path = re.findall('(/original/\d+/0)', html)[0]
                     link = 'http://www.addic7ed.com' + path
+                    request = urllib2.Request(link)
+                    # Fake a browser request
+                    request.add_header('Referer', 'http://www.addic7ed.com/')
+                    response = urllib2.urlopen(request)
                     filename = os.path.join(SUBTITLES_PATH, title+'.srt')
-                    urllib.urlretrieve(link, filename)
+                    with open(filename, 'wb') as subtitle:
+                        subtitle.write(response.read())
                     break
 
 
