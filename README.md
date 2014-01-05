@@ -1,8 +1,8 @@
 rtorrent-feeder
 ===============
 
-Automatically downloads magnets from EZRSS and The Pirate Bay. Designed for [rtorrent](http://libtorrent.rakshasa.no/), but works with any other client able to watch on a directory for new torrents.
- * Download TV show magnets from [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via rss
+This is a fairly simple Python script for automatically download magnets from [EZRSS](http://ezrss.it/) and [The Pirate Bay](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
+ * Download TV show magnets from [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
  * Allows quality to be specified (720p or low)
