@@ -59,6 +59,7 @@ def download_magnet(item):
         'magnet': magnet,
         'torrent_watch_path': TORRENT_WATCH_PATH
     }
+    # Convert magnet to torrent file
     subprocess.call(
         'MAGNET="%(magnet)s";'
         'cd %(torrent_watch_path)s;'
