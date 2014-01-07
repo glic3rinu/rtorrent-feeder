@@ -21,7 +21,7 @@ Installation
 Configuration Example
 ---------------------
 ```python
-# <CONFIG>
+# <STATE>
 SERIES = [
     {
         "season": 1, 
@@ -41,7 +41,7 @@ SERIES = [
         "hd": 1
     }
 ]
-# </CONFIG>
+# </STATE>
 
 SUBTITLES_PATH = '/media/data/subtitles/'
 SUBTITLES_LANGUAGE = 'English'
