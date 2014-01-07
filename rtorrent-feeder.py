@@ -31,13 +31,13 @@ from email.MIMEText import MIMEText
 SERIES = []
 # </CONFIG>
 
-SUBTITLES_PATH = ''
+SUBTITLES_PATH = '' # Leave blank if you don't want subtitles to be downloaded
 SUBTITLES_LANGUAGE = 'English'
 TORRENT_WATCH_PATH = ''
 TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
 LOG_LEVEL = logging.ERROR
 
-EMAIL_USER = ''
+EMAIL_USER = '' # Leave blank if you don't want email alerts
 EMAIL_PASSWORD = ''
 EMAIL_RECIPIENTS = []
 EMAIL_SMTP_HOST = ''
