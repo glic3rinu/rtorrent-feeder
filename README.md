@@ -14,7 +14,7 @@ Installation
 1. Drop the script on your system
 2. Configure it
 3. Create a similar crontab entry for periodic execution:
-```python
+```
 */5 * * * * python /home/rt/rtorrent-feeder.py
 ```
 
