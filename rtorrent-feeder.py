@@ -140,6 +140,7 @@ else:
 
 
 # Download subtitles from addic7ed.com
+# This will probably only work consistently with English language
 if SUBTITLES_PATH:
     addic7ed = urllib2.urlopen('http://www.addic7ed.com/rss.php?mode=hotspot')
     addic7ed = ET.parse(addic7ed)
