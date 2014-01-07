@@ -24,12 +24,12 @@ from email.MIMEText import MIMEText
 # If 'hd' is set to 0, or not set, only low quality will be downloaded
 # If 'hd' is set to 1 only 720p (HD) episodes will be downloaded
 #
-# ** DON'T REMOVE <CONFIG> </CONFIG> LABELS **
+# ** DON'T REMOVE <STATE> </STATE> LABELS **
 # because this block is re-used as JSON-based persistent storage :)
 #
-# <CONFIG>
+# <STATE>
 SERIES = []
-# </CONFIG>
+# </STATE>
 
 SUBTITLES_PATH = '' # Leave blank if you don't want subtitles to be downloaded
 SUBTITLES_LANGUAGE = 'English'
@@ -167,15 +167,15 @@ if SUBTITLES_PATH:
 
 if downloads:
     # Save new state
-    config = 'SERIES = ' + json.dumps(SERIES, indent=4)
+    state = 'SERIES = ' + json.dumps(SERIES, indent=4)
     context = {
-        'config': config.replace('\\\\', '\\'),
+        'state': state.replace('\\\\', '\\'),
         'script': os.path.abspath(__file__)
     }
     subprocess.call(
-        "CONFIG='%(config)s';"
-        "awk -v config=\"$CONFIG\""
-        "   '/^# <CONFIG>/{p=1; print; print config;}/# <\/CONFIG>$/{p=0}!p'"
+        "STATE='%(state)s';"
+        "awk -v state=\"STATE\""
+        "   '/^# <STATE>/{p=1; print; print state;}/# <\/STATE>$/{p=0}!p'"
         "   %(script)s > %(script)s.tmp;"
         "mv %(script)s.tmp %(script)s;"
         % context, shell=True)
