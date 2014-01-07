@@ -13,41 +13,45 @@ Installation
 0. Make sure you have Python >= 2.6
 1. Drop the script on your system
 2. Configure it
-3. Create a similar crontab entry for periodic execution: <pre><code>*/5 * * * * python /home/rt/rtorrent-feeder.py</code></pre>
-
+3. Create a similar crontab entry for periodic execution:
+```python
+*/5 * * * * python /home/rt/rtorrent-feeder.py
+```
 
 Configuration Example
 ---------------------
-    # <CONFIG>
-    SERIES = [
-        {
-            "season": 1, 
-            "episode": 10, 
-            "name": "The Blacklist", 
-        }, 
-        {
-            "season": 1, 
-            "episode": 13, 
-            "name": "House of Cards", 
-            "hd": 1
-        }, 
-        {
-            "season": 3, 
-            "episode": 11, 
-            "name": "Person of Interest", 
-            "hd": 1
-        }
-    ]
-    # </CONFIG>
-    
-    SUBTITLES_PATH = '/media/data/subtitles/'
-    SUBTITLES_LANGUAGE = 'English'
-    TORRENT_WATCH_PATH = '~/TorrentsToWatch/'
-    TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
-    LOG_LEVEL = logging.INFO
-    
-    EMAIL_USER = 'randomaddress@gmail.com'
-    EMAIL_PASSWORD = 'randompassword'
-    EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
-    EMAIL_SMTP_SERVER = 'smtp.gmail.com'
-    EMAIL_SMTP_PORT = 587
+```python
+# <CONFIG>
+SERIES = [
+    {
+        "season": 1, 
+        "episode": 10, 
+        "name": "The Blacklist", 
+    }, 
+    {
+        "season": 1, 
+        "episode": 13, 
+        "name": "House of Cards", 
+        "hd": 1
+    }, 
+    {
+        "season": 3, 
+        "episode": 11, 
+        "name": "Person of Interest", 
+        "hd": 1
+    }
+]
+# </CONFIG>
+
+SUBTITLES_PATH = '/media/data/subtitles/'
+SUBTITLES_LANGUAGE = 'English'
+TORRENT_WATCH_PATH = '~/TorrentsToWatch/'
+TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
+LOG_LEVEL = logging.INFO
+
+EMAIL_USER = 'randomaddress@gmail.com'
+EMAIL_PASSWORD = 'randompassword'
+EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
+EMAIL_SMTP_SERVER = 'smtp.gmail.com'
+EMAIL_SMTP_PORT = 587
+```
