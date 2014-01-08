@@ -188,6 +188,8 @@ if downloads:
         msg['From'] = EMAIL_USER
         msg['To'] = ', '.join(EMAIL_RECIPIENTS)
         msg['Subject'] = "%d New Downloads Available" % len(downloads)
+        if len(downloads) == 1:
+            msg['Subject'] = "One New Download Available"
         msg.attach(MIMEText('\n'.join(downloads)))
         logging.info('Sending email to %s' % msg['To'])
         server = smtplib.SMTP(EMAIL_SMTP_HOST, EMAIL_SMTP_PORT)
