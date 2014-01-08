@@ -152,19 +152,19 @@ if SUBTITLES_PATH:
             for serie in SERIES:
                 regex = r"^%s - " % serie['name']
                 if re.match(regex, title, re.IGNORECASE):
-                    link = item.find('link').text
-                    html = '\n'.join(urllib2.urlopen(link).readlines())
-                    path = re.findall('(/original/\d+/0)', html)[0]
-                    link = 'http://www.addic7ed.com' + path
-                    request = urllib2.Request(link)
-                    # Fake a browser request
-                    request.add_header('Referer', 'http://www.addic7ed.com/')
-                    response = urllib2.urlopen(request)
                     filename = os.path.join(SUBTITLES_PATH, title+'.srt')
-                    with open(filename, 'wb') as subtitle:
-                        subtitle.write(response.read())
-                    break
-
+                    if not os.path.exists(filename):
+                        link = item.find('link').text
+                        html = '\n'.join(urllib2.urlopen(link).readlines())
+                        path = re.findall('(/original/\d+/0)', html)[0]
+                        link = 'http://www.addic7ed.com' + path
+                        request = urllib2.Request(link)
+                        # Fake a browser request
+                        request.add_header('Referer', 'http://www.addic7ed.com/')
+                        response = urllib2.urlopen(request)
+                        with open(filename, 'wb') as subtitle:
+                            subtitle.write(response.read())
+                        break
 
 if downloads:
     # Save new state
