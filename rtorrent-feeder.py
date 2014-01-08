@@ -153,6 +153,7 @@ if SUBTITLES_PATH:
                 regex = r"^%s - " % serie['name']
                 if re.match(regex, title, re.IGNORECASE):
                     filename = os.path.join(SUBTITLES_PATH, title+'.srt')
+                    # Anonymous users are limited to 15 downloads, don't waste them
                     if not os.path.exists(filename):
                         link = item.find('link').text
                         html = '\n'.join(urllib2.urlopen(link).readlines())
