@@ -149,23 +149,22 @@ if SUBTITLES_PATH:
         language = item.find('description').text.split(', ')[-1]
         if language == SUBTITLES_LANGUAGE:
             title = item.find('title').text
+            filename = os.path.join(SUBTITLES_PATH, title+'.srt')
             for serie in SERIES:
                 regex = r"^%s - " % serie['name']
-                if re.match(regex, title, re.IGNORECASE):
-                    filename = os.path.join(SUBTITLES_PATH, title+'.srt')
-                    # Anonymous users are limited to 15 downloads, don't waste them
-                    if not os.path.exists(filename):
-                        link = item.find('link').text
-                        html = '\n'.join(urllib2.urlopen(link).readlines())
-                        path = re.findall('(/original/\d+/0)', html)[0]
-                        link = 'http://www.addic7ed.com' + path
-                        request = urllib2.Request(link)
-                        # Fake a browser request
-                        request.add_header('Referer', 'http://www.addic7ed.com/')
-                        response = urllib2.urlopen(request)
-                        with open(filename, 'wb') as subtitle:
-                            subtitle.write(response.read())
-                        break
+                match = re.match(regex, title, re.IGNORECASE) 
+                if match and not os.path.exists(filename):
+                    link = item.find('link').text
+                    html = '\n'.join(urllib2.urlopen(link).readlines())
+                    path = re.findall('(/original/\d+/0)', html)[0]
+                    link = 'http://www.addic7ed.com' + path
+                    request = urllib2.Request(link)
+                    # Fake a browser request
+                    request.add_header('Referer', 'http://www.addic7ed.com/')
+                    response = urllib2.urlopen(request)
+                    with open(filename, 'wb') as subtitle:
+                        subtitle.write(response.read())
+                    break
 
 if downloads:
     # Save new state
