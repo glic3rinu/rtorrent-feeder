@@ -46,6 +46,7 @@ EMAIL_SMTP_PORT = 25
 
 logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 
+# TODO don't download series more than once in a row!
 downloads = []
 
 
