@@ -175,7 +175,7 @@ if downloads:
     }
     subprocess.call(
         "STATE='%(state)s';"
-        "awk -v state=\"STATE\""
+        "awk -v state=\"$STATE\""
         "   '/^# <STATE>/{p=1; print; print state;}/# <\/STATE>$/{p=0}!p'"
         "   %(script)s > %(script)s.tmp;"
         "mv %(script)s.tmp %(script)s;"
