@@ -34,7 +34,7 @@ SERIES = []
 SUBTITLES_PATH = '' # Leave blank if you don't want subtitles to be downloaded
 SUBTITLES_LANGUAGE = 'English'
 TORRENT_WATCH_PATH = ''
-TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB']
+TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB', 'Drarbg']
 LOG_LEVEL = logging.ERROR
 
 EMAIL_USER = '' # Leave blank if you don't want email alerts
