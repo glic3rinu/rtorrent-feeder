@@ -127,7 +127,6 @@ else:
         regex = regex.replace(' ', '.')
         logging.info('TPB regex: %s' % regex)
         # Search for new episodes to download
-        season, episode = serie['season'], serie['episode']
         for item in feed.getroot()[0].findall('item'):
             title = item.find('title').text
             match = re.match(regex, title, re.IGNORECASE)
@@ -135,7 +134,7 @@ else:
             creator = item.find(creator).text
             if match and (not TPB_TRUSTED_USERS or creator in TPB_TRUSTED_USERS):
                 s, e = [ int(e) for e in match.groups() ]
-                if s > season or (s == season and e > episode):
+                if s > serie['season'] or (s == serie['season'] and e > serie['episode']):
                     download_magnet(item)
                     serie['season'] = max(serie['season'], s)
                     serie['episode'] = max(serie['episode'], e)
