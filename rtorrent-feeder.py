@@ -136,8 +136,7 @@ else:
                 s, e = [ int(e) for e in match.groups() ]
                 if s > serie['season'] or (s == serie['season'] and e > serie['episode']):
                     download_magnet(item)
-                    serie['season'] = max(serie['season'], s)
-                    serie['episode'] = max(serie['episode'], e)
+                    serie['season'], serie['episode'] = s, e
 
 
 # Download subtitles from addic7ed.com
