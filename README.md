@@ -12,7 +12,7 @@ Installation
 ------------
 0. Make sure you have Python >= 2.6
 1. Drop the script on your system
-2. Configure it
+2. [Configure it](#configuration-example)
 3. Create a similar crontab entry for periodic execution:
 ```
 */10 * * * * python /home/rt/rtorrent-feeder.py
