@@ -99,13 +99,14 @@ for serie in SERIES:
     for item in ezrss.getroot()[0].findall('item'):
         description = item.find('description').text
         match = re.match(regex, description)
-        s, e = [ int(e) for e in match.groups() ]
-        if s > 19: # Workaround to some wrongly labeled episodes
-            continue
-        if s > season or (s == season and e > episode):
-            download_magnet(item)
-            serie['season'] = max(serie['season'], s)
-            serie['episode'] = max(serie['episode'], e)
+        if match is not None:
+            s, e = [ int(e) for e in match.groups() ]
+            if s > 19: # Workaround to some wrongly labeled episodes
+                continue
+            if s > season or (s == season and e > episode):
+                download_magnet(item)
+                serie['season'] = max(serie['season'], s)
+                serie['episode'] = max(serie['episode'], e)
 
 
 # Download magnets from The Pirate Bay, only from TPB_TRUSTED_USERS
