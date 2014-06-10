@@ -166,6 +166,7 @@ if SUBTITLES_PATH:
                         subtitle.write(response.read())
                     break
 
+
 if downloads:
     # Save new state
     state = 'SERIES = ' + json.dumps(SERIES, indent=4)
