@@ -96,7 +96,13 @@ for serie in SERIES:
     ezrss = ET.parse(ezrss)
     regex = '.* Season: (\d+); Episode: (\d+)$'
     season, episode = serie['season'], serie['episode']
-    for item in ezrss.getroot()[0].findall('item'):
+    # ezrss returns status 200 for 'database connection errors'
+    try:
+        root = ezrss.getroot()[0]
+    except IndexError:
+        logging.error('Parsing %s' % url)
+        break
+    for item in root.findall('item'):
         description = item.find('description').text
         match = re.match(regex, description)
         if match is not None:
