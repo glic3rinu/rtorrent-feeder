@@ -46,15 +46,17 @@ EMAIL_SMTP_PORT = 25
 
 logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 
-# TODO don't download series more than once in a row!
 downloads = []
 
-
+# TODO Don't donwload series more than once !
 def download_magnet(item):
     """ Downloads item's magnet """
     torrent = '{http://xmlns.ezrss.it/0.1/}torrent'
     magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
-    magnet = item.find(torrent).find(magnetURI).text
+    torrent = item.find(torrent)
+    if torrent is None:
+        return
+    magnet = torrent.find(magnetURI).text
     logging.info('Downloading %s' % magnet)
     context = {
         'magnet': magnet,
@@ -96,23 +98,25 @@ for serie in SERIES:
     ezrss = ET.parse(ezrss)
     regex = '.* Season: (\d+); Episode: (\d+)$'
     season, episode = serie['season'], serie['episode']
-    # ezrss returns status 200 for 'database connection errors'
+    # Ezrss returns status 200 even when there is an error
     try:
         root = ezrss.getroot()[0]
     except IndexError:
         logging.error('Parsing %s' % url)
         break
     for item in root.findall('item'):
-        description = item.find('description').text
+        description = item.find('description')
+        if description is None:
+           continue
+        description = description.text 
         match = re.match(regex, description)
-        if match is not None:
-            s, e = [ int(e) for e in match.groups() ]
-            if s > 19: # Workaround to some wrongly labeled episodes
-                continue
-            if s > season or (s == season and e > episode):
-                download_magnet(item)
-                serie['season'] = max(serie['season'], s)
-                serie['episode'] = max(serie['episode'], e)
+        s, e = [ int(e) for e in match.groups() ]
+        if s > 19: # Workaround to some wrongly labeled episodes
+            continue
+        if s > season or (s == season and e > episode):
+            download_magnet(item)
+            serie['season'] = max(serie['season'], s)
+            serie['episode'] = max(serie['episode'], e)
 
 
 # Download magnets from The Pirate Bay, only from TPB_TRUSTED_USERS
@@ -143,7 +147,8 @@ else:
                 s, e = [ int(e) for e in match.groups() ]
                 if s > serie['season'] or (s == serie['season'] and e > serie['episode']):
                     download_magnet(item)
-                    serie['season'], serie['episode'] = s, e
+                    serie['season'] = max(serie['season'], s)
+                    serie['episode'] = max(serie['episode'], e)
 
 
 # Download subtitles from addic7ed.com
@@ -171,7 +176,6 @@ if SUBTITLES_PATH:
                     with open(filename, 'wb') as subtitle:
                         subtitle.write(response.read())
                     break
-
 
 if downloads:
     # Save new state
