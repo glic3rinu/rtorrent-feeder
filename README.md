@@ -1,8 +1,8 @@
 rtorrent-feeder
 ===============
 
-This is a fairly simple Python script for automatically download magnets from [EZRSS](http://ezrss.it/) and [The Pirate Bay](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
- * Download TV show magnets from [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS
+This is a fairly simple Python script for automatically download magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [The Pirate Bay](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
+ * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
  * Allows quality to be specified (720p or low)
@@ -12,10 +12,10 @@ Installation
 ------------
 0. Make sure you have Python >= 2.6
 1. Drop the script on your system
-2. [Configure it](#configuration-example)
+2. [Configure it](#configuration-example) by editing `settings.py`
 3. Create a similar crontab entry for periodic execution:
 ```
-*/10 * * * * python /home/rt/rtorrent-feeder.py
+*/10 * * * * cd /home/rt && python -m rtorrent-feeder.main
 ```
 
 Configuration Example
