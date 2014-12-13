@@ -35,7 +35,6 @@ SUBTITLES_PATH = '' # Leave blank if you don't want subtitles to be downloaded
 SUBTITLES_LANGUAGE = 'English'
 TORRENT_WATCH_PATH = ''
 TPB_TRUSTED_USERS = ['eztv', 'DibyaTPB', 'Drarbg']
-KICKASS_TRUSTED_USERS = ['EZTV', 
 LOG_LEVEL = logging.ERROR
 
 EMAIL_USER = '' # Leave blank if you don't want email alerts
@@ -48,9 +47,6 @@ EMAIL_SMTP_PORT = 25
 logging.basicConfig(level=LOG_LEVEL or logging.ERROR)
 
 downloads = []
-
-# TODO create class and override methods
-# TODO split settings
 
 # TODO Don't donwload series more than once !
 def download_magnet(item):
@@ -148,29 +144,6 @@ else:
             creator = '{http://purl.org/dc/elements/1.1/}creator'
             creator = item.find(creator).text
             if match and (not TPB_TRUSTED_USERS or creator in TPB_TRUSTED_USERS):
-                s, e = [ int(e) for e in match.groups() ]
-                if s > serie['season'] or (s == serie['season'] and e > serie['episode']):
-                    download_magnet(item)
-                    serie['season'] = max(serie['season'], s)
-                    serie['episode'] = max(serie['episode'], e)
-
-
-# Download magnets from Kickass Torrents, only from KICKASS_TRUSTED_USERS
-feed = 'https://kickass.so/usearch/720p%20category%3Atv/?rss=1'
-try:
-    feed = ET.parse(urllib2.urlopen(feed))
-except IOError, ET.ParseError:
-    logging.error('TPB seems down')
-else:
-    for serie in SERIES:
-        regex = '^%s S(\d+)E(\d+).+' % serie['name']
-        regex = regex.replace(' ', '.')
-        logging.info('KICKASS regex: %s' % regex)
-        for item in feed.getroot()[0].findall('item'):
-            title = item.find('title').text
-            match = re.match(regex, title, re.IGNORECASE)
-            creator = item.find('author').text.rstrip('/').split('/')[-1]
-            if match and (not KICKASS_TRUSTED_USERS or creator in KICKASS_TRUSTED_USERS):
                 s, e = [ int(e) for e in match.groups() ]
                 if s > serie['season'] or (s == serie['season'] and e > serie['episode']):
                     download_magnet(item)
