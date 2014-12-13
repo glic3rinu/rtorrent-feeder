@@ -18,9 +18,12 @@ Installation
 
 2. Configure it by editing `settings.py` file
 3. Create a similar crontab entry for periodic execution:
+
     ```bash
     */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
     ```
+
+
 
 Configuration Example
 ---------------------
