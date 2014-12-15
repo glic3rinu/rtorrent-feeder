@@ -23,8 +23,7 @@ def save_state():
         % context, shell=True)
 
 
-def send_email():
-    global downloads
+def send_email(downloads):
     msg = MIMEMultipart()
     msg['From'] = settings.EMAIL_USER
     msg['To'] = ', '.join(settings.EMAIL_RECIPIENTS)
@@ -48,7 +47,6 @@ def save_as_torrent(magnet):
         'magnet': magnet,
         'torrent_watch_path': settings.TORRENT_WATCH_PATH
     }
-    save_as_torrent()
     # Convert magnet to torrent file
     subprocess.call(
         'MAGNET="%(magnet)s";'

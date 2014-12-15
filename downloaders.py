@@ -66,7 +66,7 @@ class TPBDownloader(object):
         for item in root.findall('item'):
             title = self.get_title(item)
             match = re.match(regex, title, re.IGNORECASE)
-            if match and self.trusted_source(item):
+            if match and self.is_trusted(item):
                 s, e = [ int(e) for e in match.groups() ]
                 if s > 19: # Workaround to some wrongly labeled episodes
                     continue
@@ -78,9 +78,12 @@ class TPBDownloader(object):
         downloads = []
         for serie in settings.SERIES:
             for magnet, s, e in self.find_new_episodes(serie):
+                print magnet
                 utils.save_as_torrent(magnet)
                 self.update_serie(serie, s, e)
-                downloads.append("%s S%iE%i" % (serie['name'], s, e))
+                label = "%s S%iE%i" % (serie['name'], s, e)
+                logging.info('Downloaded: %s' % label)
+                downloads.append(label)
         return downloads
 
 
@@ -98,7 +101,7 @@ class KickAssDownloader(TPBDownloader):
             raise IOError
     
     def is_trusted(self, item):
-        return bool(item.find('author'))
+        return item.find('author') is not None
     
     def get_regex(self, serie):
         regex = '^%s S(\d+)E(\d+).+' % serie['name']
