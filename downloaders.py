@@ -61,7 +61,7 @@ class TPBDownloader(object):
         regex = self.get_regex(serie)
         try:
             root = feed.getroot()[0]
-        except IndexError:
+        except (IndexError, TypeError):
             return
         for item in root.findall('item'):
             title = self.get_title(item)
@@ -75,29 +75,30 @@ class TPBDownloader(object):
                     yield magnet, s, e
     
     def download(self):
-        downloads = []
         for serie in settings.SERIES:
             for magnet, s, e in self.find_new_episodes(serie):
+                print magnet
                 utils.save_as_torrent(magnet)
                 self.update_serie(serie, s, e)
                 label = "%s S%iE%i" % (serie['name'], s, e)
                 logging.info('Downloaded: %s' % label)
-                downloads.append(label)
-        return downloads
+                yield label
 
 
 class KickAssDownloader(TPBDownloader):
-    def get_feed(self, serie):
-        self._cached_feed = getattr(self, '_cached_feed', None) or self._get_feed()
-        return self._cached_feed
+    base_url = 'https://kickass.so/usearch/1080p%20OR%20720p%20category%3Atv%20{name}/?rss=1'
     
-    def _get_feed(self):
-        feed = 'https://kickass.so/usearch/720p%20category%3Atv/?rss=1'
+    def get_feed(self, serie):
+        name = '%20'.join(serie['name'].split())
+        feed = self.base_url.format(name=name)
         try:
             return ET.parse(urllib2.urlopen(feed))
-        except IOError, ET.ParseError:
-            logging.error('TPB seems down')
-            raise IOError
+        except IOError, e:
+            if e.code == 404:
+                logging.error('Not Found: %s' % feed)
+                return ET.ElementTree()
+            logging.error('KickAss seems down: %s' % feed)
+            raise
     
     def is_trusted(self, item):
         return item.find('author') is not None
