@@ -24,8 +24,7 @@ def save_state():
         % context, shell=True)
 
 
-def send_email():
-    global downloads
+def send_email(downloads):
     msg = MIMEMultipart()
     msg['From'] = settings.EMAIL_USER
     msg['To'] = ', '.join(settings.EMAIL_RECIPIENTS)
