@@ -20,10 +20,10 @@ if settings.SUBTITLES_PATH:
 downloads = []
 for feeder in feeders:
     try:
-        downloads += feeder.download()
+        for download in feeder.download():
+            downloads.append(download)
     except IOError:
         pass
-
 
 if downloads:
     utils.save_state()
