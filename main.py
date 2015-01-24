@@ -29,4 +29,3 @@ if downloads:
     utils.save_state()
     if settings.EMAIL_USER:
         utils.send_email(downloads)
-

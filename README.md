@@ -11,12 +11,19 @@ This is a fairly simple Python script for automatically download magnets from [K
 Installation
 ------------
 0. Make sure you have Python >= 2.6
-1. Clone this repo `cd /home/rt/ && git clone https://github.com/glic3rinu/rtorrent-feeder.git`
-2. Configure it by editing `settings.py` file
+1. Clone this repo:
+    ```bash
+    cd /home/rt/ && git clone https://github.com/glic3rinu/rtorrent-feeder.git
+    ```
+
+2. Configure it by editing [`settings.py`](settings.py) file.
 3. Create a similar crontab entry for periodic execution:
-```
-*/10 * * * * cd /home/rt && python -m rtorrent-feeder.main
-```
+
+    ```bash
+    */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
+    ```
+
+
 
 Configuration Example
 ---------------------
