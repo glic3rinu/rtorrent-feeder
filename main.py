@@ -8,8 +8,8 @@ logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 feeders = [
     downloaders.KickAssDownloader(),
-#    downloaders.TPBDownloader(),
-#    downloaders.EZRSSDownloader(),
+    downloaders.TPBDownloader(),
+    downloaders.EZRSSDownloader(),
 ]
 
 

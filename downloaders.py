@@ -59,6 +59,7 @@ class TPBDownloader(object):
     def find_new_episodes(self, serie):
         feed = self.get_feed(serie)
         regex = self.get_regex(serie)
+        found = set()
         try:
             root = feed.getroot()[0]
         except (IndexError, TypeError):
@@ -70,6 +71,9 @@ class TPBDownloader(object):
                 s, e = [ int(e) for e in match.groups() ]
                 if s > 19: # Workaround to some wrongly labeled episodes
                     continue
+                if s+e in found:
+                    continue
+                found.add(s+e)
                 if self.is_new_episode(serie, s, e):
                     magnet = self.get_magnet(item)
                     yield magnet, s, e
@@ -77,7 +81,6 @@ class TPBDownloader(object):
     def download(self):
         for serie in settings.SERIES:
             for magnet, s, e in self.find_new_episodes(serie):
-                print magnet
                 utils.save_as_torrent(magnet)
                 self.update_serie(serie, s, e)
                 q = ' HD' if serie.get('hd', 0) else ''
@@ -86,8 +89,9 @@ class TPBDownloader(object):
                 yield label
 
 
+
 class KickAssDownloader(TPBDownloader):
-    base_url = 'https://kickass.so/usearch/1080p%20OR%20720p%20category%3Atv%20{name}/?rss=1'
+    base_url = 'https://kickass.to/usearch/1080p%20OR%20720p%20category%3Atv%20{name}/?rss=1'
     
     def get_feed(self, serie):
         name = '%20'.join(serie['name'].split())
