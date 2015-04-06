@@ -8,8 +8,8 @@ logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 feeders = [
     downloaders.KickAssDownloader(),
-    downloaders.TPBDownloader(),
-    downloaders.EZRSSDownloader(),
+#    downloaders.TPBDownloader(),
+#    downloaders.EZRSSDownloader(),
 ]
 
 
@@ -24,6 +24,9 @@ for feeder in feeders:
             downloads.append(download)
     except IOError:
         pass
+    except Exception as err:
+        logging.error('%s on %s: %s' % (type(err).__name__, type(feeder).__name__, err))
+
 
 if downloads:
     utils.save_state()
