@@ -16,8 +16,8 @@ Installation
     cd /home/rt/ && git clone https://github.com/glic3rinu/rtorrent-feeder.git
     ```
 
-2. Configure it by `cp settings.py.example settings.py` and editing [`settings.py`](settings.py) file.
-3. Create a similar crontab entry for periodic execution:
+2. Create a new config file `cp settings.py.example settings.py` and [`settings.py`](edit it).
+3. Add a similar crontab entry for periodic execution:
 
     ```bash
     */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
