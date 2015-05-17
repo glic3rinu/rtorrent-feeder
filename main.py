@@ -6,15 +6,8 @@ from . import settings, utils, downloaders
 logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 
-feeders = [
-    downloaders.KickAssDownloader(),
-#    downloaders.TPBDownloader(),
-#    downloaders.EZRSSDownloader(),
-]
-
-
-if settings.SUBTITLES_PATH:
-    feeders.append(downloaders.Addic7edDownloader())
+for feeder in settings.FEEDERS:
+    feeders.append(utils.import_class(feeder)())
 
 
 downloads = []

@@ -4,7 +4,10 @@ import re
 import urllib2
 import xml.etree.ElementTree as ET
 
-from . import settings, utils
+from . import utils
+
+
+post_download = utils.Signal()
 
 
 class TPBDownloader(object):
@@ -79,6 +82,7 @@ class TPBDownloader(object):
                     yield magnet, s, e
     
     def download(self):
+        from . import settings
         for serie in settings.SERIES:
             for magnet, s, e in self.find_new_episodes(serie):
                 utils.save_as_torrent(magnet)
@@ -86,8 +90,8 @@ class TPBDownloader(object):
                 q = ' HD' if serie.get('hd', 0) else ''
                 label = "%s S%0.2dE%0.2d%s" % (serie['name'], s, e, q)
                 logging.info('Downloaded: %s' % label)
+                post_download.send(type(self), serie, s, e)
                 yield label
-
 
 
 class KickAssDownloader(TPBDownloader):
@@ -152,7 +156,11 @@ class EZRSSDownloader(TPBDownloader):
 class Addic7edDownloader(object):
     url = 'http://www.addic7ed.com/rss.php?mode=hotspot'
     
+    def get_regex(self, serie):
+        return '^%s - (\d+)x(\d+) - ' % serie['name']
+    
     def download(self):
+        from . import settings
         try:
             addic7ed = ET.parse(urllib2.urlopen(self.url))
         except:
@@ -163,9 +171,10 @@ class Addic7edDownloader(object):
                 title = item.find('title').text
                 filename = os.path.join(settings.SUBTITLES_PATH, title+'.srt')
                 for serie in settings.SERIES:
-                    regex = r"^%s - " % serie['name']
-                    match = re.match(regex, title, re.IGNORECASE) 
+                    regex = self.get_regext(serie)
+                    match = re.match(regex, title, re.IGNORECASE)
                     if match and not os.path.exists(filename):
+                        s, e = [ int(e) for e in match.groups() ]
                         link = item.find('link').text
                         html = '\n'.join(urllib2.urlopen(link).readlines())
                         path = re.findall('(/original/\d+/0)', html)[0]
@@ -176,5 +185,6 @@ class Addic7edDownloader(object):
                         response = urllib2.urlopen(request)
                         with open(filename, 'wb') as subtitle:
                             subtitle.write(response.read())
+                        post_download.send(type(self), serie, s, e, filename)
                         break
         return []

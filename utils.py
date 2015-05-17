@@ -6,10 +6,9 @@ import subprocess
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-from . import settings
-
 
 def save_state():
+    from . import settings
     state = 'SERIES = ' + json.dumps(settings.SERIES, indent=4)
     context = {
         'state': state.replace('\\\\', '\\'),
@@ -25,6 +24,7 @@ def save_state():
 
 
 def send_email(downloads):
+    from . import settings
     msg = MIMEMultipart()
     msg['From'] = settings.EMAIL_USER
     msg['To'] = ', '.join(settings.EMAIL_RECIPIENTS)
@@ -44,6 +44,7 @@ def send_email(downloads):
 
 
 def save_as_torrent(magnet):
+    from . import settings
     context = {
         'magnet': magnet,
         'torrent_watch_path': settings.TORRENT_WATCH_PATH
@@ -56,3 +57,35 @@ def save_as_torrent(magnet):
         'echo "d10:magnet-uri${#MAGNET}:${MAGNET}e"'
         '   > "meta-${BASH_REMATCH[1]}.torrent";'
         % context, shell=True, executable='/bin/bash')
+
+
+class Signal(object):
+    _registry = {}
+    
+    def connect(self, func, senders=None):
+        if senders is None:
+            senders = [None]
+        for sender in senders:
+            try:
+                self._registry[sender].append(func)
+            except KeyError:
+                self._registry[sender] = [func]
+    
+    def send(self, sender, *args, **kwargs):
+        for func in self._registry[sender] + self._registry.get(None, []):
+            func(sender, *args, **kwargs)
+
+
+def standardize(filename, serie, s, e):
+    extension = filename[-3:]
+    name = serie['name'].replace(' ', '.')
+    name += '.S%02dE%02d.' % (s, e)
+    name += extension
+    return name
+
+
+def import_class(cls):
+    module = '.'.join(cls.split('.')[:-1])
+    cls = cls.split('.')[-1]
+    module = __import__(module, fromlist=[module])
+    return getattr(module, cls)

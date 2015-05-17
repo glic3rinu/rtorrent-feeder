@@ -34,3 +34,13 @@ EMAIL_PASSWORD = ''
 EMAIL_RECIPIENTS = []
 EMAIL_SMTP_HOST = ''
 EMAIL_SMTP_PORT = 25
+
+
+FEEDERS = [
+    'downloaders.KickAssDownloader',
+#   'downloaders.TPBDownloader',
+#   'downloaders.EZRSSDownloader',
+]
+
+if SUBTITLES_PATH:
+    FEEDERS.append('downloaders.Addic7edDownloader')
