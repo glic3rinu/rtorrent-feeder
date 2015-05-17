@@ -61,4 +61,14 @@ EMAIL_PASSWORD = 'randompassword'
 EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
 EMAIL_SMTP_SERVER = 'smtp.gmail.com'
 EMAIL_SMTP_PORT = 587
+
+from . import downloaders
+FEEDERS = [
+    downloaders.KickAssDownloader,
+#   downloaders.TPBDownloader,
+#   downloaders.EZRSSDownloader,
+]
+if SUBTITLES_PATH:
+    FEEDERS.append(downloaders.Addic7edDownloader)
+
 ```
