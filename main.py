@@ -6,8 +6,9 @@ from . import settings, utils, downloaders
 logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 
+feeders = []
 for feeder in settings.FEEDERS:
-    feeders.append(utils.import_class(feeder)())
+    feeders.append(feeder())
 
 
 downloads = []

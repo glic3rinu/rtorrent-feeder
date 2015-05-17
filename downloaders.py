@@ -171,7 +171,7 @@ class Addic7edDownloader(object):
                 title = item.find('title').text
                 filename = os.path.join(settings.SUBTITLES_PATH, title+'.srt')
                 for serie in settings.SERIES:
-                    regex = self.get_regext(serie)
+                    regex = self.get_regex(serie)
                     match = re.match(regex, title, re.IGNORECASE)
                     if match and not os.path.exists(filename):
                         s, e = [ int(e) for e in match.groups() ]

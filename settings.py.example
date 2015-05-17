@@ -36,11 +36,11 @@ EMAIL_SMTP_HOST = ''
 EMAIL_SMTP_PORT = 25
 
 
+from . import downloaders
 FEEDERS = [
-    'downloaders.KickAssDownloader',
-#   'downloaders.TPBDownloader',
-#   'downloaders.EZRSSDownloader',
+    downloaders.KickAssDownloader,
+#   downloaders.TPBDownloader,
+#   downloaders.EZRSSDownloader,
 ]
-
 if SUBTITLES_PATH:
-    FEEDERS.append('downloaders.Addic7edDownloader')
+    FEEDERS.append(downloaders.Addic7edDownloader)

@@ -82,10 +82,3 @@ def standardize(filename, serie, s, e):
     name += '.S%02dE%02d.' % (s, e)
     name += extension
     return name
-
-
-def import_class(cls):
-    module = '.'.join(cls.split('.')[:-1])
-    cls = cls.split('.')[-1]
-    module = __import__(module, fromlist=[module])
-    return getattr(module, cls)
