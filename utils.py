@@ -72,7 +72,7 @@ class Signal(object):
                 self._registry[sender] = [func]
     
     def send(self, sender, *args, **kwargs):
-        for func in self._registry[sender] + self._registry.get(None, []):
+        for func in self._registry.get(sender, []) + self._registry.get(None, []):
             func(sender, *args, **kwargs)
 
 
