@@ -1,12 +1,14 @@
 rtorrent-feeder
 ===============
 
-This is a fairly simple Python script for automatically download magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [The Pirate Bay](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
- * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS
+This is a fairly simple Python script for automatically download magnets from [Kickass Torrents (RSS)](https://kickass.so/), [EZRSS (RSS)](http://ezrss.it/) and [The Pirate Bay (RSS and HTML)](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
+ * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS and/or HTML
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
- * Allows quality to be specified (720p or low)
+ * Allows quality to be specified (`'lo'`, `'hd'`, `'1080p'` or `'720p'`)
 
+
+**At this time ThePirateBay and EZRSS have their RSS feeds down**
 
 Installation
 ------------
@@ -33,19 +35,19 @@ SERIES = [
     {
         "season": 1, 
         "episode": 10, 
-        "name": "The Blacklist", 
+        "name": "The Blacklist"
     }, 
     {
         "season": 1, 
         "episode": 13, 
         "name": "House of Cards", 
-        "hd": 1
+        "quality": '1080p'
     }, 
     {
         "season": 3, 
         "episode": 11, 
         "name": "Person of Interest", 
-        "hd": 1
+        "quality": 'hd'
     }
 ]
 # </STATE>
@@ -64,11 +66,43 @@ EMAIL_SMTP_PORT = 587
 
 from . import downloaders
 FEEDERS = [
-    downloaders.KickAssDownloader,
-#   downloaders.TPBDownloader,
-#   downloaders.EZRSSDownloader,
+    'rtorrent-feeder.downloaders.KickAssDownloader',
+    'rtorrent-feeder.downloaders.TPBHTMLDownloader',
+#   'rtorrent-feeder.downloaders.TPBDownloader',
+#   'rtorrent-feeder.downloaders.EZRSSDownloader',
 ]
-if SUBTITLES_PATH:
-    FEEDERS.append(downloaders.Addic7edDownloader)
 
+if SUBTITLES_PATH:
+    FEEDERS.append('rtorrent-feeder.downloaders.Addic7edDownloader')
+```
+
+
+Signals
+-------
+Support for registering functions to be executed after a torrent/subtitle download is performed is provided by `downloaders.post_download` signal.
+
+For using it, you can create a `signals.py` file inside rtorrent-feeder directory with your function and register it with `downloaders.post_download.connect()`.
+
+For example:
+
+```python
+# signals.py
+
+import subprocess
+from . import utils, downloaders
+
+def send_subtitles_home(sender, serie, s, e, filename):
+    standard_filename = utils.standardize(filename, serie, s, e)
+    scp_cmd = 'scp "{filename}" user@home:/media/subtitles/{standard_filename}'.format(
+        filename=filename, standard_filename=standard_filename)
+    subprocess.call(scp_cmd, shell=True)
+
+downloaders.post_download.connect(send_subtitles_home, senders=[downloaders.Addic7edDownloader])
+```
+
+If you are using rtorrent and you want actions to be executed after a torrent download is completed you can use rtorrent built-in event system. For example:
+
+```
+# .rtorrent.rc
+system.method.set_key = event.download.finished,sync_serie,"execute=ssh,root@calmisko.org,/home/rt/sync,$d.get_base_path="
 ```

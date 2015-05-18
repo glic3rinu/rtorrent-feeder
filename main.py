@@ -3,13 +3,19 @@ import traceback
 
 from . import settings, utils, downloaders
 
+try:
+    # Custo signals
+    from . import signals
+except ImportError:
+    pass
+
 
 logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 
 feeders = []
 for feeder in settings.FEEDERS:
-    feeders.append(feeder())
+    feeders.append(utils.import_class(feeder)())
 
 
 downloads = []

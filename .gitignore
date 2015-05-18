@@ -3,3 +3,4 @@
 settings.py
 sync.py
 sync-wrap
+signals.py

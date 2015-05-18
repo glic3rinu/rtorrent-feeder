@@ -12,17 +12,18 @@ post_download = utils.Signal()
 
 class TPBDownloader(object):
     def get_regex(self, serie):
+        quality = serie.get('quality', 'hd')
+        if quality not in ('720p', '1080p'):
+            quality = ''
         regex = '^%s S(\d+)E(\d+).+' % serie['name']
-        feed = feeds['lo']
-        if serie.get('hd', 0):
-            regex += '720p '
         regex = regex.replace(' ', '.')
         logging.info('TPB regex: %s' % regex)
         return regex
     
     def get_feed(self, serie):
         self._cached_feeds = getattr(self, '_cached_feeds', None) or self._get_feeds()
-        if serie.get('hd', 0):
+        quality = serie.get('quality')
+        if quality in ('hd', '1080p', '720p'):
             return self._cached_feeds['hd']
         return self._cached_feeds['lo']
     
@@ -71,7 +72,7 @@ class TPBDownloader(object):
             title = self.get_title(item)
             match = re.match(regex, title, re.IGNORECASE)
             if match and self.is_trusted(item):
-                s, e = [ int(e) for e in match.groups() ]
+                s, e = [ int(e) for e in match.groups()[:2] ]
                 if s > 19: # Workaround to some wrongly labeled episodes
                     continue
                 if s+e in found:
@@ -94,12 +95,62 @@ class TPBDownloader(object):
                 yield label
 
 
+class TPBHTMLDownloader(TPBDownloader):
+    def get_regex(self, serie):
+        regex = r'magnet:\?xt=.*=%s S(\d+)E(\d+).+' % serie['name']
+        regex = regex.replace(' ', '.')
+        logging.info('TPBHTML regex: %s' % regex)
+        return regex
+    
+    def get_magnet_regex(self, serie):
+        quality = serie.get('quality', 'hd')
+        if quality not in ('720p', '1080p'):
+            quality = ''
+        regex = r'(magnet:\?xt=.*=%s S\d+E\d+.+%s[^"]+)'% (serie['name'], quality)
+        regex = regex.replace(' ', '.')
+        logging.info('TPBHTML magnet_regex: %s' % regex)
+        return regex
+    
+    def _get_feeds(self):
+        try:
+            return {
+                'hd': urllib2.urlopen('https://thepiratebay.se/browse/208').read(),
+                'lo': urllib2.urlopen('https://thepiratebay.se/browse/205').read()
+            }
+        except:
+            logging.error('TPB seems down')
+            raise IOError
+    
+    def find_new_episodes(self, serie):
+        feed = self.get_feed(serie)
+        magnet_regex = self.get_magnet_regex(serie)
+        found = set()
+        for magnet in re.findall(magnet_regex, feed, re.IGNORECASE):
+            regex = self.get_regex(serie)
+            match = re.match(regex, magnet, re.IGNORECASE)
+            # TODO TPB_TRUSTED_USERS
+            s, e = [ int(e) for e in match.groups()[:2] ]
+            if s > 19: # Workaround to some wrongly labeled episodes
+                continue
+            if s+e in found:
+                continue
+            found.add(s+e)
+            if self.is_new_episode(serie, s, e):
+                yield magnet, s, e
+
+
 class KickAssDownloader(TPBDownloader):
-    base_url = 'https://kickass.to/usearch/1080p%20OR%20720p%20category%3Atv%20{name}/?rss=1'
+    base_url = 'https://kat.cr/usearch/category%3Atv%20{name}%20{quality}/?rss=1'
     
     def get_feed(self, serie):
         name = '%20'.join(serie['name'].split())
-        feed = self.base_url.format(name=name)
+        quality = serie.get('quality', 'hd')
+        if quality == 'hd':
+            quality = '1080p%20OR%20720p'
+        elif quality not in ('1080p', '720p'):
+            quality = '-1080p%20-720p'
+        feed = self.base_url.format(name=name, quality=quality)
+        logging.info('KICKASS feed: %s' % feed)
         try:
             return ET.parse(urllib2.urlopen(feed, timeout=10))
         except IOError, e:
@@ -127,8 +178,9 @@ class EZRSSDownloader(TPBDownloader):
     
     def get_feed(self, serie):
         name = serie['name'].replace(' ', '+')
-        if serie.get('hd', 0):
-            quality = 'quality=720p'
+        quality = serie.get('quality', 'hd')
+        if quality in ('720p', '1080p'):
+            quality = 'quality=' + quality
         else:
             quality = 'quality=HDTV&quality_exact=true'
         query = 'show_name=%s&show_name_exact=true&%s&mode=rss' % (name, quality)
