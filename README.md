@@ -93,11 +93,12 @@ from . import utils, downloaders
 
 def send_subtitles_home(sender, serie, s, e, filename):
     standard_filename = utils.standardize(filename, serie, s, e)
-    scp_cmd = 'scp "{filename}" user@home:/media/subtitles/{standard_filename}'.format(
-        filename=filename, standard_filename=standard_filename)
+    scp_cmd = 'scp "{filename}" user@home:/media/subtitles/{standard_filename}'
+    scp_cmd = scp_cmd.format(filename=filename, standard_filename=standard_filename)
     subprocess.call(scp_cmd, shell=True)
 
-downloaders.post_download.connect(send_subtitles_home, senders=[downloaders.Addic7edDownloader])
+downloaders.post_download.connect(
+    send_subtitles_home, senders=[downloaders.Addic7edDownloader])
 ```
 
 If you are using rtorrent and you want actions to be executed after a torrent download is completed you can use rtorrent built-in event system. For example:
