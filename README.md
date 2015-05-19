@@ -92,7 +92,7 @@ from . import utils, feeders
 
 def send_subtitles_home(sender, serie, s, e, filename):
     standard_filename = utils.standardize(filename, serie, s, e)
-    scp_cmd = 'scp "{filename}" user@home:/media/subtitles/{standard_filename}'
+    scp_cmd = 'scp "/media/subtitles/{filename}" user@home:/media/subtitles/{standard_filename}'
     scp_cmd = scp_cmd.format(filename=filename, standard_filename=standard_filename)
     subprocess.call(scp_cmd, shell=True)
 
