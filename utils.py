@@ -1,3 +1,4 @@
+import ast
 import json
 import logging
 import os
@@ -7,20 +8,56 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
 
-def save_state():
+def get_settings_path():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(current_dir, 'settings.py')
+    return path
+
+
+def get_series_lineno(settings_path):
+    with open(settings_path, 'rb') as handler:
+        p = ast.parse(handler.read())
+    found = False
+    for elem in p.body:
+        targets = getattr(elem, 'targets', None)
+        if targets:
+            if found:
+                return found, elem.lineno-1
+            var_name = targets[0].id
+            if var_name == 'SERIES':
+                found = elem.lineno
+
+def apply_changes(settings_path, ini, end):
     from . import settings
-    state = 'SERIES = ' + json.dumps(settings.SERIES, indent=4)
-    context = {
-        'state': state.replace('\\\\', '\\'),
-        'script': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'settings.py')
-    }
-    subprocess.call(
-        "STATE='%(state)s';"
-        "awk -v state=\"$STATE\""
-        "   '/^# <STATE>/{p=1; print; print state;}/# <\/STATE>$/{p=0}!p'"
-        "   %(script)s > %(script)s.tmp;"
-        "mv %(script)s.tmp %(script)s;"
-        % context, shell=True)
+    content = []
+    inside = False
+    with open(settings_path, 'r') as handler:
+        for num, line in enumerate(handler.readlines(), 1):
+            line = line.rstrip()
+            if num == ini:
+                inside = True
+                series = settings.SERIES
+                content.append(
+                    'SERIES = %s' % json.dumps(series, indent=4)
+                )
+            elif num == end:
+                inside = False
+                content.append('')
+            elif not inside:
+                content.append(line)
+    return '\n'.join(content)
+
+
+def save_series(backup=True):
+    settings_path = get_settings_path()
+    ini, end = get_series_lineno(settings_path)
+    content = apply_changes(settings_path, ini, end)
+    tmp_settings_path = settings_path + '.tmp'
+    with open(tmp_settings_path, 'w') as handle:
+        handle.write(content)
+    if backup:
+        os.rename(settings_path, settings_path + '.backup')
+    os.rename(tmp_settings_path, settings_path)
 
 
 def send_email(downloads):

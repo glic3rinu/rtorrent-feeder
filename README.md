@@ -30,7 +30,6 @@ Installation
 Configuration Example
 ---------------------
 ```python
-# <STATE>
 SERIES = [
     {
         "season": 1, 
@@ -50,7 +49,6 @@ SERIES = [
         "quality": 'hd'
     }
 ]
-# </STATE>
 
 SUBTITLES_PATH = '/media/data/subtitles/'
 SUBTITLES_LANGUAGE = 'English'

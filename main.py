@@ -32,6 +32,6 @@ for feeder in feeders:
 
 
 if downloads:
-    utils.save_state()
+    utils.save_series()
     if settings.EMAIL_USER:
         utils.send_email(downloads)
