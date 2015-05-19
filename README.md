@@ -1,12 +1,13 @@
 rtorrent-feeder
 ===============
 
-This is a fairly simple Python script for automatically download magnets from [Kickass Torrents (RSS)](https://kickass.so/), [EZRSS (RSS)](http://ezrss.it/) and [The Pirate Bay (RSS and HTML)](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
+This is a fairly simple Python tool for automatically download magnets from [Kickass Torrents (RSS)](https://kickass.so/), [EZRSS (RSS)](http://ezrss.it/) and [The Pirate Bay (RSS and HTML)](http://thepiratebay.se). It has been written for [rtorrent](http://libtorrent.rakshasa.no/) but it will work with any other client that is just able to _watch on a folder_ for new torrents.
  * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS and/or HTML
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
  * Allows quality to be specified (`'lo'`, `'hd'`, `'1080p'` or `'720p'`)
- * Has support for running functions after events [signals](#Signals)
+ * Easily enable/disable specific feeders with a setting variable
+ * Has support for running functions after events ([signals](#signals))
 
 
 **At this time ThePirateBay and EZRSS have their RSS feeds down**
@@ -63,7 +64,6 @@ EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
 EMAIL_SMTP_SERVER = 'smtp.gmail.com'
 EMAIL_SMTP_PORT = 587
 
-from . import downloaders
 FEEDERS = [
     'rtorrent-feeder.downloaders.KickAssDownloader',
     'rtorrent-feeder.downloaders.TPBHTMLDownloader',
