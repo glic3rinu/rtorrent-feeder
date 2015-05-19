@@ -22,8 +22,8 @@ for feeder in settings.FEEDERS:
 downloads = []
 for feeder in feeders:
     try:
-        for download in feeder.download():
-            downloads.append(download)
+        for feed in feeder.feed():
+            downloads.append(feed)
     except (IOError, urllib2.URLError, urllib2.HTTPError) as err:
         logging.error('%s on %s: %s' % (type(err).__name__, type(feeder).__name__, err))
     except Exception as err:

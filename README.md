@@ -65,22 +65,22 @@ EMAIL_SMTP_SERVER = 'smtp.gmail.com'
 EMAIL_SMTP_PORT = 587
 
 FEEDERS = [
-    'rtorrent-feeder.downloaders.KickAssDownloader',
-    'rtorrent-feeder.downloaders.TPBHTMLDownloader',
-#   'rtorrent-feeder.downloaders.TPBDownloader',
-#   'rtorrent-feeder.downloaders.EZRSSDownloader',
+    'rtorrent-feeder.feeders.KickAssFeeder',
+    'rtorrent-feeder.feeders.TPBHTMLFeeder',
+#   'rtorrent-feeder.feeders.TPBFeeder',
+#   'rtorrent-feeder.feeders.EZRSSFeeder',
 ]
 
 if SUBTITLES_PATH:
-    FEEDERS.append('rtorrent-feeder.downloaders.Addic7edDownloader')
+    FEEDERS.append('rtorrent-feeder.feeders.Addic7edDownloader')
 ```
 
 
 Signals
 -------
-Support for registering functions to be executed after a torrent/subtitle download is performed is provided by `downloaders.post_download` signal.
+Support for registering functions to be executed after a torrent/subtitle download is performed is provided by `feeders.post_feed` signal.
 
-For using it, you can create a `signals.py` file inside rtorrent-feeder directory with your function and register it with `downloaders.post_download.connect()`.
+For using it, you can create a `signals.py` file inside rtorrent-feeder directory with your function and register it with `feeders.post_feed.connect()`.
 
 For example:
 
@@ -96,7 +96,7 @@ def send_subtitles_home(sender, serie, s, e, filename):
     scp_cmd = scp_cmd.format(filename=filename, standard_filename=standard_filename)
     subprocess.call(scp_cmd, shell=True)
 
-downloaders.post_download.connect(
+downloaders.post_feed.connect(
     send_subtitles_home, senders=[downloaders.Addic7edDownloader])
 ```
 
