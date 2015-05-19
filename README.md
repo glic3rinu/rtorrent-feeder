@@ -63,7 +63,6 @@ EMAIL_RECIPIENTS = ['randomaddress@gmail.com']
 EMAIL_SMTP_SERVER = 'smtp.gmail.com'
 EMAIL_SMTP_PORT = 587
 
-from . import downloaders
 FEEDERS = [
     'rtorrent-feeder.downloaders.KickAssDownloader',
     'rtorrent-feeder.downloaders.TPBHTMLDownloader',
