@@ -30,11 +30,11 @@ EMAIL_SMTP_PORT = 25
 
 
 FEEDERS = [
-    'rtorrent-feeder.downloaders.KickAssDownloader',
-    'rtorrent-feeder.downloaders.TPBHTMLDownloader',
-#   'rtorrent-feeder.downloaders.TPBDownloader',
-#   'rtorrent-feeder.downloaders.EZRSSDownloader',
+    'rtorrent-feeder.feeders.KickAssFeeder',
+    'rtorrent-feeder.feeders.TPBHTMLFeeder',
+#   'rtorrent-feeder.feeders.TPBFeeder',
+#   'rtorrent-feeder.feeders.EZRSSFeeder',
 ]
 
 if SUBTITLES_PATH:
-    FEEDERS.append('rtorrent-feeder.downloaders.Addic7edDownloader')
+    FEEDERS.append('rtorrent-feeder.feeders.Addic7edDownloader')

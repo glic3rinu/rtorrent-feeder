@@ -2,7 +2,7 @@ import logging
 import traceback
 import urllib2
 
-from . import settings, utils, downloaders
+from . import settings, utils
 
 try:
     # Custo signals
