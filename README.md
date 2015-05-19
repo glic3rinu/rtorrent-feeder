@@ -86,14 +86,16 @@ For example:
 
 ```python
 # signals.py
-
+import os
 import subprocess
 from . import utils, feeders
 
 def send_subtitles_home(sender, serie, s, e, filename):
     standard_filename = utils.standardize(filename, serie, s, e)
-    scp_cmd = 'scp "/media/subtitles/{filename}" user@home:/media/subtitles/{standard_filename}'
-    scp_cmd = scp_cmd.format(filename=filename, standard_filename=standard_filename)
+    srt_path = os.path.join('/media/subtitles/', filename)
+    dst_path = os.path.join('/media/subtitles/', standard_filename)
+    scp_cmd = 'scp "{src_path}" user@home:"{dst_path}"'.format(
+        src_path=src_path, dst_path=dst_path)
     subprocess.call(scp_cmd, shell=True)
 
 feeders.post_feed.connect(
