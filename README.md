@@ -6,6 +6,7 @@ This is a fairly simple Python script for automatically download magnets from [K
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
  * Allows quality to be specified (`'lo'`, `'hd'`, `'1080p'` or `'720p'`)
+ * Easily enable/disable specific feeders with a setting variable
  * Has support for running functions after events ([signals](#signals))
 
 
