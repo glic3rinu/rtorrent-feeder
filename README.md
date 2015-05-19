@@ -5,9 +5,9 @@ This is a fairly simple Python tool for automatically download magnets from [Kic
  * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS and/or HTML
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
- * Allows quality to be specified (`'lo'`, `'hd'`, `'1080p'` or `'720p'`)
+ * Allows quality to be specified: *lo*, *hd*, *720p* or *1080p*
  * Easily enable/disable specific feeders with a setting variable
- * Has support for running functions after events ([signals](#signals))
+ * Has support for running functions after events using [signals](#signals)
 
 
 **At this time ThePirateBay and EZRSS have their RSS feeds down**
