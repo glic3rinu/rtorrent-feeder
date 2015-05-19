@@ -38,8 +38,9 @@ class TPBDownloader(object):
             raise IOError
     
     def is_trusted(self, item):
+        from . import settings
         user = self.get_user(item)
-        return bool(not self.TPB_TRUSTED_USERS or user in self.TPB_TRUSTED_USERS)
+        return bool(not settings.TPB_TRUSTED_USERS or user in settings.TPB_TRUSTED_USERS)
     
     def get_magnet(self, item):
         magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
@@ -112,31 +113,43 @@ class TPBHTMLDownloader(TPBDownloader):
         return regex
     
     def _get_feeds(self):
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+        }
+        hq_req = urllib2.Request('https://thepiratebay.se/browse/208/0/9/0', headers=headers)
+        lo_req = urllib2.Request('https://thepiratebay.se/browse/205/0/9/0', headers=headers)
         try:
             return {
-                'hd': urllib2.urlopen('https://thepiratebay.se/browse/208').read(),
-                'lo': urllib2.urlopen('https://thepiratebay.se/browse/205').read()
+                'hd': urllib2.urlopen(hq_req).read(),
+                'lo': urllib2.urlopen(lo_req).read()
             }
         except:
             logging.error('TPB seems down')
-            raise IOError
+            raise
+    
+    def is_trusted(self, magnet, feed):
+        from . import settings
+        feed = feed.replace('\n', ' ')
+        td = re.findall(r'<td>.*(<a href="%s".*?)</td>' % re.escape(magnet), feed)[0]
+        user = re.findall(r'<a href="/user/(.*?)">', td)[0]
+        return bool(' alt="VIP" ' in td or (not settings.TPB_TRUSTED_USERS or user in settings.TPB_TRUSTED_USERS))
     
     def find_new_episodes(self, serie):
         feed = self.get_feed(serie)
         magnet_regex = self.get_magnet_regex(serie)
         found = set()
         for magnet in re.findall(magnet_regex, feed, re.IGNORECASE):
-            regex = self.get_regex(serie)
-            match = re.match(regex, magnet, re.IGNORECASE)
-            # TODO TPB_TRUSTED_USERS
-            s, e = [ int(e) for e in match.groups()[:2] ]
-            if s > 19: # Workaround to some wrongly labeled episodes
-                continue
-            if s+e in found:
-                continue
-            found.add(s+e)
-            if self.is_new_episode(serie, s, e):
-                yield magnet, s, e
+            if self.is_trusted(magnet, feed):
+                regex = self.get_regex(serie)
+                match = re.match(regex, magnet, re.IGNORECASE)
+                s, e = [ int(e) for e in match.groups()[:2] ]
+                if s > 19: # Workaround to some wrongly labeled episodes
+                    continue
+                if s+e in found:
+                    continue
+                found.add(s+e)
+                if self.is_new_episode(serie, s, e):
+                    yield magnet, s, e
 
 
 class KickAssDownloader(TPBDownloader):

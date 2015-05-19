@@ -1,5 +1,6 @@
 import logging
 import traceback
+import urllib2
 
 from . import settings, utils, downloaders
 
@@ -23,7 +24,7 @@ for feeder in feeders:
     try:
         for download in feeder.download():
             downloads.append(download)
-    except IOError as err:
+    except (IOError, urllib2.URLError, urllib2.HTTPError) as err:
         logging.error('%s on %s: %s' % (type(err).__name__, type(feeder).__name__, err))
     except Exception as err:
         logging.error('%s on %s: %s' % (type(err).__name__, type(feeder).__name__, err))
