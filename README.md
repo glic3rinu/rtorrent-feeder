@@ -21,7 +21,7 @@ Installation
     ```
 
 2. Create a new config file `cp settings.py.example settings.py` and [`edit it`](#configuration-example).
-3. Add a similar crontab entry for periodic execution:
+3. Add a similar crontab entry for periodic execution `crontab -e`:
 
     ```bash
     */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
