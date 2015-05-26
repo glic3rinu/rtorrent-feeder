@@ -5,9 +5,9 @@ This is a fairly simple Python tool for automatically download magnets from [Kic
  * Download TV show magnets from [Kickass Torrents](https://kickass.so/), [EZRSS](http://ezrss.it/) and [TPB](http://thepiratebay.se) via RSS and/or HTML
  * Optional downloading of subtitles from [Addic7ed](http://www.addic7ed.com/)
  * Optional email alerts of new downloads
- * Allows quality to be specified (`'lo'`, `'hd'`, `'1080p'` or `'720p'`)
+ * Allows quality to be specified: *lo*, *hd*, *720p* or *1080p*
  * Easily enable/disable specific feeders with a setting variable
- * Has support for running functions after events ([signals](#signals))
+ * Has support for running functions after events using [signals](#signals)
 
 
 **At this time ThePirateBay and EZRSS have their RSS feeds down**
@@ -21,7 +21,7 @@ Installation
     ```
 
 2. Create a new config file `cp settings.py.example settings.py` and [`edit it`](#configuration-example).
-3. Add a similar crontab entry for periodic execution:
+3. Add a similar crontab entry for periodic execution `crontab -e`:
 
     ```bash
     */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
@@ -86,18 +86,20 @@ For example:
 
 ```python
 # signals.py
-
+import os
 import subprocess
-from . import utils, downloaders
+from . import utils, feeders
 
 def send_subtitles_home(sender, serie, s, e, filename):
     standard_filename = utils.standardize(filename, serie, s, e)
-    scp_cmd = 'scp "{filename}" user@home:/media/subtitles/{standard_filename}'
-    scp_cmd = scp_cmd.format(filename=filename, standard_filename=standard_filename)
+    srt_path = os.path.join('/media/subtitles/', filename)
+    dst_path = os.path.join('/media/subtitles/', standard_filename)
+    scp_cmd = 'scp "{src_path}" user@home:"{dst_path}"'.format(
+        src_path=src_path, dst_path=dst_path)
     subprocess.call(scp_cmd, shell=True)
 
-downloaders.post_feed.connect(
-    send_subtitles_home, senders=[downloaders.Addic7edDownloader])
+feeders.post_feed.connect(
+    send_subtitles_home, senders=[feeders.Addic7edDownloader])
 ```
 
 If you are using rtorrent and you want actions to be executed after a torrent download is completed you can use rtorrent built-in event system. For example:
