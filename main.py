@@ -4,14 +4,14 @@ import urllib2
 
 from . import settings, utils
 
+logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
+
 try:
     # Custo signals
     from . import signals
 except ImportError:
+    logging.info("Custom signals not installed.")
     pass
-
-
-logging.basicConfig(level=settings.LOG_LEVEL or logging.ERROR)
 
 
 feeders = []
