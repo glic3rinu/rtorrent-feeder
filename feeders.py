@@ -30,8 +30,8 @@ class TPBFeeder(object):
     def _get_feeds(self):
         try:
             return {
-                'hd': ET.parse(urllib2.urlopen('http://rss.thepiratebay.se/208')),
-                'lo': ET.parse(urllib2.urlopen('http://rss.thepiratebay.se/205'))
+                'hd': ET.parse(urllib2.urlopen('http://rss.thepiratebay.mn/208'), timeout=5),
+                'lo': ET.parse(urllib2.urlopen('http://rss.thepiratebay.mn/205'), timeout=5)
             }
         except:
             logging.error('TPB seems down')
@@ -73,12 +73,12 @@ class TPBFeeder(object):
             title = self.get_title(item)
             match = re.match(regex, title, re.IGNORECASE)
             if match and self.is_trusted(item):
-                s, e = [ int(e) for e in match.groups()[:2] ]
+                s, e = [ int(n) for n in match.groups()[:2] ]
                 if s > 19: # Workaround to some wrongly labeled episodes
                     continue
-                if s+e in found:
+                if str(s)+str(e) in found:
                     continue
-                found.add(s+e)
+                found.add(str(s)+str(e))
                 if self.is_new_episode(serie, s, e):
                     magnet = self.get_magnet(item)
                     yield magnet, s, e
@@ -86,14 +86,20 @@ class TPBFeeder(object):
     def feed(self):
         from . import settings
         for serie in settings.SERIES:
+            max_s = 0
+            max_e = 0
             for magnet, s, e in self.find_new_episodes(serie):
                 utils.save_as_torrent(magnet)
-                self.update_serie(serie, s, e)
+                max_s = max(max_s, s)
+                max_e = max(max_e, e)
                 q = ' HD' if serie.get('hd', 0) else ''
                 label = "%s S%0.2dE%0.2d%s" % (serie['name'], s, e, q)
                 logging.info('Downloaded: %s' % label)
                 post_feed.send(type(self), serie, s, e)
                 yield label
+            if max_s != 0:
+                self.update_serie(serie, max_s, max_e)
+
 
 
 class TPBHTMLFeeder(TPBFeeder):
@@ -116,12 +122,12 @@ class TPBHTMLFeeder(TPBFeeder):
         headers = {
             'User-Agent': 'Mozilla/5.0',
         }
-        hq_req = urllib2.Request('https://thepiratebay.se/browse/208/0/9/0', headers=headers)
-        lo_req = urllib2.Request('https://thepiratebay.se/browse/205/0/9/0', headers=headers)
+        hq_req = urllib2.Request('https://thepiratebay.mn/browse/208/0/9/0', headers=headers)
+        lo_req = urllib2.Request('https://thepiratebay.mn/browse/205/0/9/0', headers=headers)
         try:
             return {
-                'hd': urllib2.urlopen(hq_req).read(),
-                'lo': urllib2.urlopen(lo_req).read()
+                'hd': urllib2.urlopen(hq_req, timeout=5).read(),
+                'lo': urllib2.urlopen(lo_req, timeout=5).read()
             }
         except:
             logging.error('TPB seems down')
@@ -142,12 +148,12 @@ class TPBHTMLFeeder(TPBFeeder):
             if self.is_trusted(magnet, feed):
                 regex = self.get_regex(serie)
                 match = re.match(regex, magnet, re.IGNORECASE)
-                s, e = [ int(e) for e in match.groups()[:2] ]
+                s, e = [ int(n) for n in match.groups()[:2] ]
                 if s > 19: # Workaround to some wrongly labeled episodes
                     continue
-                if s+e in found:
+                if str(s)+str(e) in found:
                     continue
-                found.add(s+e)
+                found.add(str(s)+str(e))
                 if self.is_new_episode(serie, s, e):
                     yield magnet, s, e
 
