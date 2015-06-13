@@ -24,7 +24,7 @@ Installation
 3. Add a similar crontab entry for periodic execution `crontab -e`:
 
     ```bash
-    */10 * * * * cd /home/rt && python -m rtorrent-feeder.main
+    */10 * * * * /usr/bin/python -m rtorrent-feeder.main
     ```
 
 
