@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import urllib2
 import xml.etree.ElementTree as ET
 
 from . import utils
@@ -30,8 +29,8 @@ class TPBFeeder(object):
     def _get_feeds(self):
         try:
             return {
-                'hd': ET.parse(urllib2.urlopen('http://rss.thepiratebay.mn/208'), timeout=5),
-                'lo': ET.parse(urllib2.urlopen('http://rss.thepiratebay.mn/205'), timeout=5)
+                'hd': ET.parse(utils.fetch_url('http://rss.thepiratebay.mn/208')),
+                'lo': ET.parse(utils.fetch_url('http://rss.thepiratebay.mn/205')),
             }
         except:
             logging.error('TPB seems down')
@@ -119,15 +118,10 @@ class TPBHTMLFeeder(TPBFeeder):
         return regex
     
     def _get_feeds(self):
-        headers = {
-            'User-Agent': 'Mozilla/5.0',
-        }
-        hq_req = urllib2.Request('https://thepiratebay.mn/browse/208/0/9/0', headers=headers)
-        lo_req = urllib2.Request('https://thepiratebay.mn/browse/205/0/9/0', headers=headers)
         try:
             return {
-                'hd': urllib2.urlopen(hq_req, timeout=5).read(),
-                'lo': urllib2.urlopen(lo_req, timeout=5).read()
+                'hd': utils.fetch_url('https://thepiratebay.mn/browse/208/0/9/0').read(),
+                'lo': utils.fetch_url('https://thepiratebay.mn/browse/205/0/9/0').read(),
             }
         except:
             logging.error('TPB seems down')
@@ -171,7 +165,7 @@ class KickAssFeeder(TPBFeeder):
         feed = self.base_url.format(name=name, quality=quality)
         logging.info('KICKASS feed: %s' % feed)
         try:
-            return ET.parse(urllib2.urlopen(feed, timeout=10))
+            return ET.parse(utils.fetch_url(feed))
         except IOError, e:
             if getattr(e, 'code', 0) == 404:
                 logging.error('Not Found: %s' % feed)
@@ -205,7 +199,7 @@ class EZRSSFeeder(TPBFeeder):
         query = 'show_name=%s&show_name_exact=true&%s&mode=rss' % (name, quality)
         url = self.base_url + '?' + query
         try:
-            ezrss = urllib2.urlopen(url)
+            ezrss = utils.fetch_url(url)
         except IOError, e:
             logging.error('Querying %s ABORTING' % url)
             raise e
@@ -233,7 +227,7 @@ class Addic7edDownloader(object):
     def feed(self):
         from . import settings
         try:
-            addic7ed = ET.parse(urllib2.urlopen(self.url))
+            addic7ed = ET.parse(utils.fetch_url(self.url))
         except:
             raise IOError
         for item in addic7ed.getroot()[0].findall('item'):
@@ -247,15 +241,17 @@ class Addic7edDownloader(object):
                     if match and not os.path.exists(filename):
                         s, e = [ int(e) for e in match.groups() ]
                         link = item.find('link').text
-                        html = '\n'.join(urllib2.urlopen(link).readlines())
+                        html = '\n'.join(utils.fetch_url(link).readlines())
                         path = re.findall('(/original/\d+/0)', html)[0]
                         link = 'http://www.addic7ed.com' + path
-                        request = urllib2.Request(link)
-                        # Fake a browser request
-                        request.add_header('Referer', 'http://www.addic7ed.com/')
-                        response = urllib2.urlopen(request)
+                        content = utils.fetch_url(
+                            link,
+                            headers={
+                                'Referer': 'http://www.addic7ed.com/'
+                            }
+                        )
                         with open(filename, 'wb') as subtitle:
-                            subtitle.write(response.read())
+                            subtitle.write(content.read())
                         post_feed.send(type(self), serie, s, e, filename)
                         break
         return []

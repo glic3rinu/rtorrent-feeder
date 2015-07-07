@@ -1,9 +1,13 @@
 import ast
+import gzip
 import json
 import logging
 import os
 import smtplib
 import subprocess
+import urllib2
+from StringIO import StringIO
+
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
@@ -26,6 +30,24 @@ def get_series_lineno(settings_path):
             var_name = targets[0].id
             if var_name == 'SERIES':
                 found = elem.lineno
+
+
+def fetch_url(url, headers=None, timeout=5):
+    extra_headers = {
+        'User-Agent': 'Mozilla/5.0',
+        'Accept-encoding': 'gzip'
+    }
+    extra_headers.update(headers or {})
+    request = urllib2.Request(url, headers=extra_headers)
+    response = urllib2.urlopen(request, timeout=timeout)
+    if response.info().get('Content-Encoding') == 'gzip':
+        buf = StringIO(response.read())
+        f = gzip.GzipFile(fileobj=buf)
+        f.getcode = lambda f: response.getcode()
+        return f
+    else:
+        return response
+
 
 def apply_changes(settings_path, ini, end):
     from . import settings
