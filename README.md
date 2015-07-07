@@ -106,5 +106,5 @@ If you are using rtorrent and you want actions to be executed after a torrent do
 
 ```
 # .rtorrent.rc
-system.method.set_key = event.download.finished,sync_serie,"execute=ssh,root@calmisko.org,/home/rt/sync,$d.get_base_path="
+system.method.set_key = event.download.finished,sync_serie,"execute=ssh,user@example.com,/home/rt/sync,$d.get_base_path="
 ```
