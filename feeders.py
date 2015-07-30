@@ -10,6 +10,11 @@ post_feed = utils.Signal()
 
 
 class TPBFeeder(object):
+    @property
+    def feed_domain(self):
+        from . import settings
+        return getattr(settings, 'TPB_DOMAIN', 'thepiratebay.mn')
+    
     def get_regex(self, serie):
         quality = serie.get('quality', 'hd')
         if quality not in ('720p', '1080p'):
@@ -27,10 +32,11 @@ class TPBFeeder(object):
         return self._cached_feeds['lo']
     
     def _get_feeds(self):
+        domain = self.feed_domain
         try:
             return {
-                'hd': ET.parse(utils.fetch_url('http://rss.thepiratebay.mn/208')),
-                'lo': ET.parse(utils.fetch_url('http://rss.thepiratebay.mn/205')),
+                'hd': ET.parse(utils.fetch_url('https://rss.%s/208' % domain)),
+                'lo': ET.parse(utils.fetch_url('https://rss.%s/205' % domain)),
             }
         except:
             logging.error('TPB seems down')
@@ -112,16 +118,17 @@ class TPBHTMLFeeder(TPBFeeder):
         quality = serie.get('quality', 'hd')
         if quality not in ('720p', '1080p'):
             quality = ''
-        regex = r'(magnet:\?xt=.*=%s S\d+E\d+.+%s[^"]+)'% (serie['name'], quality)
+        regex = r'(magnet:\?xt=.*=%s S\d+E\d+[^"]+%s[^"]+)'% (serie['name'], quality)
         regex = regex.replace(' ', '.')
         logging.info('TPBHTML magnet_regex: %s' % regex)
         return regex
     
     def _get_feeds(self):
+        domain = self.feed_domain
         try:
             return {
-                'hd': utils.fetch_url('https://thepiratebay.mn/browse/208/0/9/0').read(),
-                'lo': utils.fetch_url('https://thepiratebay.mn/browse/205/0/9/0').read(),
+                'hd': utils.fetch_url('https://%s/browse/208/0/9/0' % domain).read(),
+                'lo': utils.fetch_url('https://%s/browse/205/0/9/0' % domain).read(),
             }
         except:
             logging.error('TPB seems down')
@@ -174,7 +181,7 @@ class KickAssFeeder(TPBFeeder):
             raise
     
     def is_trusted(self, item):
-        return item.find('author') is not None
+        return item.find('{http://xmlns.ezrss.it/0.1/}verified').text == '1'
     
     def get_regex(self, serie):
         regex = '^%s S(\d+)E(\d+).+' % serie['name']
@@ -222,7 +229,8 @@ class Addic7edDownloader(object):
     url = 'http://www.addic7ed.com/rss.php?mode=hotspot'
     
     def get_regex(self, serie):
-        return '^%s - (\d+)x(\d+) - ' % serie['name']
+        name = serie['name'].replace('Mr ', 'Mr. ')
+        return '^%s - (\d+)x(\d+) - ' % name
     
     def feed(self):
         from . import settings

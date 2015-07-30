@@ -6,3 +6,4 @@ sync-wrap
 signals.py
 settings.py.tmp
 settings.py.backup
+*.save
