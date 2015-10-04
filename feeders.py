@@ -19,7 +19,7 @@ class TPBFeeder(object):
         quality = serie.get('quality', 'hd')
         if quality not in ('720p', '1080p'):
             quality = ''
-        regex = '^%s S(\d+)E(\d+).+' % serie['name']
+        regex = '^%s (?:20[0-9][0-9] )?S(\d+)E(\d+).+' % serie['name']
         regex = regex.replace(' ', '.')
         logging.info('TPB regex: %s' % regex)
         return regex
@@ -184,7 +184,7 @@ class KickAssFeeder(TPBFeeder):
         return item.find('{http://xmlns.ezrss.it/0.1/}verified').text == '1'
     
     def get_regex(self, serie):
-        regex = '^%s S(\d+)E(\d+).+' % serie['name']
+        regex = '^%s (?:20[0-9][0-9] )?S(\d+)E(\d+).+' % serie['name']
         regex = regex.replace(' ', '.')
         logging.info('KICKASS regex: %s' % regex)
         return regex
