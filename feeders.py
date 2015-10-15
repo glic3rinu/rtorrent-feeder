@@ -10,10 +10,12 @@ post_feed = utils.Signal()
 
 
 class TPBFeeder(object):
+    def __init__(self, settings):
+        self.settings = settings
+    
     @property
     def feed_domain(self):
-        from . import settings
-        return getattr(settings, 'TPB_DOMAIN', 'thepiratebay.mn')
+        return getattr(self.settings, 'TPB_DOMAIN', 'thepiratebay.mn')
     
     def get_regex(self, serie):
         quality = serie.get('quality', 'hd')
@@ -43,9 +45,8 @@ class TPBFeeder(object):
             raise IOError
     
     def is_trusted(self, item):
-        from . import settings
         user = self.get_user(item)
-        return bool(not settings.TPB_TRUSTED_USERS or user in settings.TPB_TRUSTED_USERS)
+        return bool(not self.settings.TPB_TRUSTED_USERS or user in self.settings.TPB_TRUSTED_USERS)
     
     def get_magnet(self, item):
         magnetURI = '{http://xmlns.ezrss.it/0.1/}magnetURI'
@@ -60,8 +61,10 @@ class TPBFeeder(object):
         return item.find(creator).text
     
     def update_serie(self, serie, s, e):
+        logging.info('Update serie %(name)s OLD: S%(season)02.fE%(episode)02.f' % serie)
         serie['season'] = max(serie['season'], s)
         serie['episode'] = max(serie['episode'], e)
+        logging.info('Update serie %(name)s OLD: S%(season)02.fE%(episode)02.f' % serie)
     
     def is_new_episode(self, serie, s, e):
         return s > serie['season'] or (s == serie['season'] and e > serie['episode'])
@@ -89,8 +92,7 @@ class TPBFeeder(object):
                     yield magnet, s, e
     
     def feed(self):
-        from . import settings
-        for serie in settings.SERIES:
+        for serie in self.settings.SERIES:
             max_s = 0
             max_e = 0
             for magnet, s, e in self.find_new_episodes(serie):
@@ -135,11 +137,10 @@ class TPBHTMLFeeder(TPBFeeder):
             raise
     
     def is_trusted(self, magnet, feed):
-        from . import settings
         feed = feed.replace('\n', ' ')
         td = re.findall(r'<td>.*(<a href="%s".*?)</td>' % re.escape(magnet), feed)[0]
         user = re.findall(r'<a href="/user/(.*?)">', td)[0]
-        return bool(' alt="VIP" ' in td or (not settings.TPB_TRUSTED_USERS or user in settings.TPB_TRUSTED_USERS))
+        return bool(' alt="VIP" ' in td or (not self.settings.TPB_TRUSTED_USERS or user in self.settings.TPB_TRUSTED_USERS))
     
     def find_new_episodes(self, serie):
         feed = self.get_feed(serie)
@@ -225,7 +226,7 @@ class EZRSSFeeder(TPBFeeder):
             return title.text
 
 
-class Addic7edDownloader(object):
+class Addic7edDownloader(TPBFeeder):
     url = 'http://www.addic7ed.com/rss.php?mode=hotspot'
     
     def get_regex(self, serie):
@@ -233,17 +234,16 @@ class Addic7edDownloader(object):
         return '^%s - (\d+)x(\d+) - ' % name
     
     def feed(self):
-        from . import settings
         try:
             addic7ed = ET.parse(utils.fetch_url(self.url))
         except:
             raise IOError
         for item in addic7ed.getroot()[0].findall('item'):
             language = item.find('description').text.split(', ')[-1]
-            if language == settings.SUBTITLES_LANGUAGE:
+            if language == self.settings.SUBTITLES_LANGUAGE:
                 title = item.find('title').text
-                filename = os.path.join(settings.SUBTITLES_PATH, title+'.srt')
-                for serie in settings.SERIES:
+                filename = os.path.join(self.settings.SUBTITLES_PATH, title+'.srt')
+                for serie in self.settings.SERIES:
                     regex = self.get_regex(serie)
                     match = re.match(regex, title, re.IGNORECASE)
                     if match and not os.path.exists(filename):

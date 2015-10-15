@@ -16,7 +16,7 @@ except ImportError:
 
 feeders = []
 for feeder in settings.FEEDERS:
-    feeders.append(utils.import_class(feeder)())
+    feeders.append(utils.import_class(feeder)(settings))
 
 
 downloads = []
@@ -32,6 +32,6 @@ for feeder in feeders:
 
 
 if downloads:
-    utils.save_series()
+    utils.save_series(settings, settings.SERIES)
     if settings.EMAIL_USER:
-        utils.send_email(downloads)
+        utils.send_email(downloads, settings)

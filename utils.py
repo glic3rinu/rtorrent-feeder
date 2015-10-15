@@ -12,12 +12,6 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
 
-def get_settings_path():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    path = os.path.join(current_dir, 'settings.py')
-    return path
-
-
 def get_series_lineno(settings_path):
     with open(settings_path, 'rb') as handler:
         p = ast.parse(handler.read())
@@ -49,8 +43,7 @@ def fetch_url(url, headers=None, timeout=5):
         return response
 
 
-def apply_changes(settings_path, ini, end):
-    from . import settings
+def apply_changes(settings_path, series, ini, end):
     content = []
     inside = False
     with open(settings_path, 'r') as handler:
@@ -58,7 +51,6 @@ def apply_changes(settings_path, ini, end):
             line = line.rstrip()
             if num == ini:
                 inside = True
-                series = settings.SERIES
                 content.append(
                     'SERIES = %s' % json.dumps(series, indent=4)
                 )
@@ -70,10 +62,10 @@ def apply_changes(settings_path, ini, end):
     return '\n'.join(content)
 
 
-def save_series(backup=True):
-    settings_path = get_settings_path()
+def save_series(settings, series, backup=True):
+    settings_path = settings.__file__.replace('.pyc', '.py')
     ini, end = get_series_lineno(settings_path)
-    content = apply_changes(settings_path, ini, end)
+    content = apply_changes(settings_path, series, ini, end)
     tmp_settings_path = settings_path + '.tmp'
     with open(tmp_settings_path, 'w') as handle:
         handle.write(content)
@@ -82,8 +74,7 @@ def save_series(backup=True):
     os.rename(tmp_settings_path, settings_path)
 
 
-def send_email(downloads):
-    from . import settings
+def send_email(downloads, settings):
     msg = MIMEMultipart()
     msg['From'] = settings.EMAIL_USER
     msg['To'] = ', '.join(settings.EMAIL_RECIPIENTS)
