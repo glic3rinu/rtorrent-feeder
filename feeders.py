@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import urllib
 import xml.etree.ElementTree as ET
 
 from . import utils
@@ -61,10 +62,10 @@ class TPBFeeder(object):
         return item.find(creator).text
     
     def update_serie(self, serie, s, e):
-        logging.info('Update serie %(name)s OLD: S%(season)02.fE%(episode)02.f' % serie)
+        logging.info('Update serie %(name)s S%(season)02.fE%(episode)02.f' % serie)
         serie['season'] = max(serie['season'], s)
         serie['episode'] = max(serie['episode'], e)
-        logging.info('Update serie %(name)s OLD: S%(season)02.fE%(episode)02.f' % serie)
+        logging.info('Update serie %(name)s new value: S%(season)02.fE%(episode)02.f' % serie)
     
     def is_new_episode(self, serie, s, e):
         return s > serie['season'] or (s == serie['season'] and e > serie['episode'])
@@ -164,13 +165,12 @@ class KickAssFeeder(TPBFeeder):
     base_url = 'https://kat.cr/usearch/category%3Atv%20{name}%20{quality}/?rss=1'
     
     def get_feed(self, serie):
-        name = '%20'.join(serie['name'].split())
         quality = serie.get('quality', 'hd')
         if quality == 'hd':
-            quality = '1080p%20OR%20720p'
+            quality = '1080p OR 720p'
         elif quality not in ('1080p', '720p'):
-            quality = '-1080p%20-720p'
-        feed = self.base_url.format(name=name, quality=quality)
+            quality = '-1080p -720p'
+        feed = self.base_url.format(name=urllib.quote(serie['name']), quality=urllib.quote(quality))
         logging.info('KICKASS feed: %s' % feed)
         try:
             return ET.parse(utils.fetch_url(feed))
@@ -182,13 +182,18 @@ class KickAssFeeder(TPBFeeder):
             raise
     
     def is_trusted(self, item):
-        return item.find('{http://xmlns.ezrss.it/0.1/}verified').text == '1'
+        return item.find('{//kastatic.com/xmlns/0.1/}verified').text == '1'
     
     def get_regex(self, serie):
         regex = '^%s (?:20[0-9][0-9] )?S(\d+)E(\d+).+' % serie['name']
         regex = regex.replace(' ', '.')
         logging.info('KICKASS regex: %s' % regex)
         return regex
+
+    def get_magnet(self, item):
+        magnetURI = '{//kastatic.com/xmlns/0.1/}magnetURI'
+        magnet = item.find(magnetURI)
+        return magnet.text
 
 
 class EZRSSFeeder(TPBFeeder):
