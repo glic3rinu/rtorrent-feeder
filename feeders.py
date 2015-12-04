@@ -128,19 +128,25 @@ class TPBHTMLFeeder(TPBFeeder):
     
     def _get_feeds(self):
         domain = self.feed_domain
+        hd_feed = 'https://%s/browse/208/0/9/0' % domain
+        lo_feed = 'https://%s/browse/205/0/9/0' % domain
         try:
-            return {
-                'hd': utils.fetch_url('https://%s/browse/208/0/9/0' % domain).read(),
-                'lo': utils.fetch_url('https://%s/browse/205/0/9/0' % domain).read(),
-            }
+            logging.info('TPB HD feed: %s' % hd_feed)
+            hd = utils.fetch_url(hd_feed).read()
+            logging.info('TPB LO feed: %s' % lo_feed)
+            lo = utils.fetch_url(lo_feed).read()
         except:
             logging.error('TPB seems down')
             raise
+        return {
+            'hd': hd,
+            'lo': lo,
+        }
     
     def is_trusted(self, magnet, feed):
         feed = feed.replace('\n', ' ')
-        td = re.findall(r'<td>.*(<a href="%s".*?)</td>' % re.escape(magnet), feed)[0]
-        user = re.findall(r'<a href="/user/(.*?)">', td)[0]
+        td = re.findall(r'<td>.*( href="%s".*?)</td>' % re.escape(magnet), feed)[0]
+        user = re.findall(r' href="/user/(.*?)">', td)[0]
         return bool(' alt="VIP" ' in td or (not self.settings.TPB_TRUSTED_USERS or user in self.settings.TPB_TRUSTED_USERS))
     
     def find_new_episodes(self, serie):
