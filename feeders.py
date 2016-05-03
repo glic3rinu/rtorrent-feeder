@@ -94,19 +94,17 @@ class TPBFeeder(object):
     
     def feed(self):
         for serie in self.settings.SERIES:
-            max_s = 0
-            max_e = 0
+            max_s = (0, 0)
             for magnet, s, e in self.find_new_episodes(serie):
                 utils.save_as_torrent(magnet)
-                max_s = max(max_s, s)
-                max_e = max(max_e, e)
+                max_s = max(max_s, (s, e))
                 q = ' HD' if serie.get('hd', 0) else ''
                 label = "%s S%0.2dE%0.2d%s" % (serie['name'], s, e, q)
                 logging.info('Downloaded: %s' % label)
                 post_feed.send(type(self), serie, s, e)
                 yield label
-            if max_s != 0:
-                self.update_serie(serie, max_s, max_e)
+            if max_s != (0, 0):
+                self.update_serie(serie, *max_s)
 
 
 
