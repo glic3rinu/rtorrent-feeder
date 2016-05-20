@@ -63,8 +63,8 @@ class TPBFeeder(object):
     
     def update_serie(self, serie, s, e):
         logging.info('Update serie %(name)s S%(season)02.fE%(episode)02.f' % serie)
-        serie['season'] = max(serie['season'], s)
-        serie['episode'] = max(serie['episode'], e)
+        serie['season'] = s
+        serie['episode'] = e
         logging.info('Update serie %(name)s new value: S%(season)02.fE%(episode)02.f' % serie)
     
     def is_new_episode(self, serie, s, e):
