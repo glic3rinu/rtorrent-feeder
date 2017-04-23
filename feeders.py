@@ -248,7 +248,10 @@ class Addic7edDownloader(TPBFeeder):
         except:
             raise IOError
         for item in addic7ed.getroot()[0].findall('item'):
-            language = item.find('description').text.split(', ')[-1]
+            description = item.find('description').text
+            if not description:
+                continue
+            language = description.split(', ')[-1]
             if language == self.settings.SUBTITLES_LANGUAGE:
                 title = item.find('title').text
                 filename = os.path.join(self.settings.SUBTITLES_PATH, title+'.srt')
